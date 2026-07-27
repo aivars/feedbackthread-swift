@@ -131,7 +131,7 @@ The drop-in views ship in **English and Italian** and follow the device's
 language automatically — nothing to configure. A locale the SDK doesn't carry
 falls back to English.
 
-Everything a user reads lives in one String Catalog,
+All SDK-authored user-facing text lives in one String Catalog,
 `Sources/FeedbackThread/Resources/Localizable.xcstrings`. Adding a language is a
 pull request against that file and nothing else: open it in Xcode, add the
 language, translate every key. A test fails if any key is left untranslated or

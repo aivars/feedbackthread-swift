@@ -4,7 +4,7 @@
 
 The drop-in views are localized, and ship in English and Italian.
 
-- Every user-facing string now lives in a String Catalog
+- Every SDK-authored user-facing string now lives in a String Catalog
   (`Sources/FeedbackThread/Resources/Localizable.xcstrings`, 50 keys) resolved
   against the SDK's own bundle, so the board, the feedback form, and My Requests
   follow the device's language. Adding a language is a pull request against that
