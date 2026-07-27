@@ -1,0 +1,930 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "%lld votes" : {
+      "comment" : "Accessibility value of the vote button: how many votes the request has.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld vote"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld votes"
+                }
+              }
+            }
+          }
+        },
+        "it" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld voto"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld voti"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "All" : {
+      "comment" : "Filter chip on the request board: show requests of every status. Agrees with 'requests' (Italian: richieste, feminine).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tutte"
+          }
+        }
+      }
+    },
+    "Anything you submit shows up here, including while it’s waiting for review." : {
+      "comment" : "Below 'No requests yet'.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anything you submit shows up here, including while it’s waiting for review."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tutto ciò che invii compare qui, anche mentre è in attesa di revisione."
+          }
+        }
+      }
+    },
+    "Apple Watch" : {
+      "comment" : "Tag on a request that targets watchOS. An Apple product name — keep it untranslated in every language.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple Watch"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple Watch"
+          }
+        }
+      }
+    },
+    "Be the first to share an idea." : {
+      "comment" : "Empty board, below 'No feature requests yet'.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Be the first to share an idea."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Proponi tu la prima idea."
+          }
+        }
+      }
+    },
+    "Bug" : {
+      "comment" : "Tag on a request that is a bug report, and the matching option in the feedback form's type picker.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bug"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bug"
+          }
+        }
+      }
+    },
+    "Cancel" : {
+      "comment" : "Button that dismisses the feedback form without submitting.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Annulla"
+          }
+        }
+      }
+    },
+    "Choose another status to see more requests." : {
+      "comment" : "Empty filtered board: other statuses still have requests.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose another status to see more requests."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scegli un altro stato per vedere altre richieste."
+          }
+        }
+      }
+    },
+    "Closed" : {
+      "comment" : "My Requests section header, above the caller's rejected requests.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Closed"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chiuse"
+          }
+        }
+      }
+    },
+    "Completed" : {
+      "comment" : "Request status, and the matching filter chip.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Completed"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Completata"
+          }
+        }
+      }
+    },
+    "Couldn’t load requests" : {
+      "comment" : "Error title when the public board fails to load.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couldn’t load requests"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossibile caricare le richieste"
+          }
+        }
+      }
+    },
+    "Couldn’t load your requests" : {
+      "comment" : "Error title when the My Requests list fails to load.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couldn’t load your requests"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossibile caricare le tue richieste"
+          }
+        }
+      }
+    },
+    "Done" : {
+      "comment" : "Button that closes the board, the My Requests sheet, or the sent-feedback form.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Done"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fine"
+          }
+        }
+      }
+    },
+    "Feature requests" : {
+      "comment" : "Navigation title of the public request board.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Feature requests"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Richieste di funzionalità"
+          }
+        }
+      }
+    },
+    "Feedback" : {
+      "comment" : "Navigation title of the feedback form.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Feedback"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Feedback"
+          }
+        }
+      }
+    },
+    "Feedback details" : {
+      "comment" : "Accessibility label of the multi-line text editor in the feedback form.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Feedback details"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dettagli del feedback"
+          }
+        }
+      }
+    },
+    "Feedback sent. Thank you!" : {
+      "comment" : "Confirmation after submitting a bug report.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Feedback sent. Thank you!"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Feedback inviato. Grazie!"
+          }
+        }
+      }
+    },
+    "Feedback type" : {
+      "comment" : "Accessibility label of the segmented picker choosing between Bug and Request.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Feedback type"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tipo di feedback"
+          }
+        }
+      }
+    },
+    "FeedbackThread returned HTTP %lld." : {
+      "comment" : "Error shown to the end user when the API fails without a readable message; %lld is the HTTP status code.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "FeedbackThread returned HTTP %lld."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "FeedbackThread ha restituito il codice HTTP %lld."
+          }
+        }
+      }
+    },
+    "FeedbackThread returned an unreadable response." : {
+      "comment" : "Error shown to the end user when the API response can't be decoded.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "FeedbackThread returned an unreadable response."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "FeedbackThread ha restituito una risposta illeggibile."
+          }
+        }
+      }
+    },
+    "In progress" : {
+      "comment" : "Request status, the matching filter chip, and a My Requests section header.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In progress"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In corso"
+          }
+        }
+      }
+    },
+    "In review" : {
+      "comment" : "Request status, and the matching filter chip. Moderated and visible on the public board, not yet planned.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In review"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In revisione"
+          }
+        }
+      }
+    },
+    "Loading requests…" : {
+      "comment" : "Progress indicator while the public board loads.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading requests…"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Caricamento delle richieste…"
+          }
+        }
+      }
+    },
+    "Loading your requests…" : {
+      "comment" : "Progress indicator while the My Requests list loads.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading your requests…"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Caricamento delle tue richieste…"
+          }
+        }
+      }
+    },
+    "My requests" : {
+      "comment" : "Navigation title of the My Requests list, and the accessibility label of the toolbar button that opens it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "My requests"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le mie richieste"
+          }
+        }
+      }
+    },
+    "No completed requests" : {
+      "comment" : "Empty board with the 'Completed' filter selected.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No completed requests"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nessuna richiesta completata"
+          }
+        }
+      }
+    },
+    "No feature requests yet" : {
+      "comment" : "Empty board: nothing has been published at all yet.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No feature requests yet"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ancora nessuna richiesta"
+          }
+        }
+      }
+    },
+    "No planned requests" : {
+      "comment" : "Empty board with the 'Planned' filter selected.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No planned requests"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nessuna richiesta pianificata"
+          }
+        }
+      }
+    },
+    "No requests" : {
+      "comment" : "Empty board with the 'All' filter selected.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No requests"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nessuna richiesta"
+          }
+        }
+      }
+    },
+    "No requests in progress" : {
+      "comment" : "Empty board with the 'In progress' filter selected.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No requests in progress"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nessuna richiesta in corso"
+          }
+        }
+      }
+    },
+    "No requests in review" : {
+      "comment" : "Empty board with the 'In review' filter selected. A whole sentence rather than an interpolated status name, which no language can inflect correctly.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No requests in review"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nessuna richiesta in revisione"
+          }
+        }
+      }
+    },
+    "No requests yet" : {
+      "comment" : "Empty My Requests list: this person has never submitted anything.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No requests yet"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non hai ancora inviato richieste"
+          }
+        }
+      }
+    },
+    "Planned" : {
+      "comment" : "Request status, and the matching filter chip.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Planned"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pianificata"
+          }
+        }
+      }
+    },
+    "Rejected" : {
+      "comment" : "Request status: declined during moderation. Only the reporter ever sees this.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rejected"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rifiutata"
+          }
+        }
+      }
+    },
+    "Remove vote" : {
+      "comment" : "Accessibility label of the vote button when the user has already voted.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove vote"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rimuovi il voto"
+          }
+        }
+      }
+    },
+    "Request" : {
+      "comment" : "Navigation title of a single request's detail view, and the matching option in the feedback form's type picker.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Request"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Richiesta"
+          }
+        }
+      }
+    },
+    "Request submitted for review." : {
+      "comment" : "Confirmation after submitting a feature request, which is moderated before it appears on the public board.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Request submitted for review."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Richiesta inviata per la revisione."
+          }
+        }
+      }
+    },
+    "Request unavailable" : {
+      "comment" : "Shown when a request that was open in the detail view is no longer on the board.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Request unavailable"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Richiesta non disponibile"
+          }
+        }
+      }
+    },
+    "Review" : {
+      "comment" : "A feedback kind: an App Store or Google Play review ingested by FeedbackThread. Never submitted from inside the app.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Review"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recensione"
+          }
+        }
+      }
+    },
+    "Send feedback" : {
+      "comment" : "Submit button of the feedback form.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Send feedback"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Invia feedback"
+          }
+        }
+      }
+    },
+    "Shipped" : {
+      "comment" : "My Requests section header, above the caller's released requests.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shipped"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rilasciate"
+          }
+        }
+      }
+    },
+    "Shipped in %@" : {
+      "comment" : "Badge on a released request; %@ is a version number, e.g. '2.4.0'.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shipped in %@"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rilasciata nella versione %@"
+          }
+        }
+      }
+    },
+    "Short title" : {
+      "comment" : "Placeholder of the one-line title field in the feedback form.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Short title"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Titolo breve"
+          }
+        }
+      }
+    },
+    "Suggest a feature" : {
+      "comment" : "Primary button at the bottom of the board; opens the submission form.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suggest a feature"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suggerisci una funzionalità"
+          }
+        }
+      }
+    },
+    "This request is no longer available on the public board." : {
+      "comment" : "Below 'Request unavailable'.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This request is no longer available on the public board."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Questa richiesta non è più disponibile nella bacheca pubblica."
+          }
+        }
+      }
+    },
+    "Try again" : {
+      "comment" : "Button that retries a failed load.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Try again"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Riprova"
+          }
+        }
+      }
+    },
+    "Vote" : {
+      "comment" : "Accessibility label of the vote button when the user has not voted yet. A verb.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vote"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vota"
+          }
+        }
+      }
+    },
+    "Waiting for review" : {
+      "comment" : "Request status, and a My Requests section header: submitted but not yet moderated. Only the reporter ever sees this.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Waiting for review"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In attesa di revisione"
+          }
+        }
+      }
+    },
+    "What would you like to share?" : {
+      "comment" : "Section header above the feedback form's fields.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What would you like to share?"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cosa vuoi condividere?"
+          }
+        }
+      }
+    },
+    "filter.chip" : {
+      "comment" : "Filter chip on the request board: %@ is the filter name, %lld how many requests match it. e.g. 'Planned (12)'.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ (%lld)"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ (%lld)"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

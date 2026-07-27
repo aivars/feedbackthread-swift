@@ -61,17 +61,26 @@ extension String {
         }
     }
 
-    /// A user-facing label for the status: the known stage's display name, or
-    /// the raw status sensibly capitalized when the stage isn't recognized.
-    var feedbackThreadRequestLabel: String {
+    /// A user-facing label for the status: the known stage's display name from
+    /// the SDK's String Catalog, or the raw status sensibly capitalized when the
+    /// stage isn't recognized.
+    ///
+    /// Note that the recognized labels are *display* strings that happen to read
+    /// like the wire values matched in ``feedbackThreadRequestStage`` above. They
+    /// are translated; the wire values never are.
+    ///
+    /// The unrecognized case stays a verbatim passthrough: a status this SDK
+    /// version doesn't know is a value the server invented, so it has no
+    /// translation and must not be looked up as a catalog key.
+    var feedbackThreadRequestLabel: LocalizedStringResource {
         switch feedbackThreadRequestStage {
-        case .pendingReview: "Waiting for review"
-        case .inReview: "In review"
-        case .planned: "Planned"
-        case .inProgress: "In progress"
-        case .completed: "Completed"
-        case .rejected: "Rejected"
-        case .unknown: sensiblyCapitalized
+        case .pendingReview: .feedbackThread("Waiting for review")
+        case .inReview: .feedbackThread("In review")
+        case .planned: .feedbackThread("Planned")
+        case .inProgress: .feedbackThread("In progress")
+        case .completed: .feedbackThread("Completed")
+        case .rejected: .feedbackThread("Rejected")
+        case .unknown: .feedbackThreadVerbatim(sensiblyCapitalized)
         }
     }
 

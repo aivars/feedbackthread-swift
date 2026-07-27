@@ -58,12 +58,14 @@ public struct FeedbackThreadMyRequestsList: View {
     public var body: some View {
         NavigationStack {
             content
-                .navigationTitle("My requests")
+                .navigationTitle(Text("My requests", bundle: .module))
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
                     if let onDismiss {
                         ToolbarItem(placement: .cancellationAction) {
-                            Button("Done", action: onDismiss)
+                            Button(action: onDismiss) {
+                                Text("Done", bundle: .module)
+                            }
                         }
                     }
                 }
@@ -78,29 +80,31 @@ public struct FeedbackThreadMyRequestsList: View {
     private var content: some View {
         switch loadState {
         case .loading where myRequests.isEmpty:
-            ProgressView("Loading your requests…")
+            ProgressView { Text("Loading your requests…", bundle: .module) }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         case .failed(let message) where myRequests.isEmpty:
             MyRequestsMessage(
-                title: "Couldn’t load your requests",
-                message: message,
+                title: .feedbackThread("Couldn’t load your requests"),
+                // The error's own description: written by the server or by
+                // URLSession, already localized (or not) at its source.
+                message: .feedbackThreadVerbatim(message),
                 systemImage: "wifi.exclamationmark",
-                actionTitle: "Try again",
+                actionTitle: .feedbackThread("Try again"),
                 action: { Task { await load() } }
             )
         default:
             List {
-                myRequestsSection(title: "Waiting for review", items: pendingReviewItems)
-                myRequestsSection(title: "In progress", items: inProgressItems)
-                myRequestsSection(title: "Shipped", items: shippedItems)
-                myRequestsSection(title: "Closed", items: closedItems)
+                myRequestsSection(title: .feedbackThread("Waiting for review"), items: pendingReviewItems)
+                myRequestsSection(title: .feedbackThread("In progress"), items: inProgressItems)
+                myRequestsSection(title: .feedbackThread("Shipped"), items: shippedItems)
+                myRequestsSection(title: .feedbackThread("Closed"), items: closedItems)
             }
             .listStyle(.insetGrouped)
             .overlay {
                 if myRequests.isEmpty {
                     MyRequestsMessage(
-                        title: "No requests yet",
-                        message: "Anything you submit shows up here, including while it's waiting for review.",
+                        title: .feedbackThread("No requests yet"),
+                        message: .feedbackThread("Anything you submit shows up here, including while it’s waiting for review."),
                         systemImage: "tray"
                     )
                 }
@@ -110,12 +114,19 @@ public struct FeedbackThreadMyRequestsList: View {
     }
 
     @ViewBuilder
-    private func myRequestsSection(title: String, items: [FeedbackThreadMyRequest]) -> some View {
+    private func myRequestsSection(
+        title: LocalizedStringResource,
+        items: [FeedbackThreadMyRequest]
+    ) -> some View {
         if !items.isEmpty {
-            Section(title) {
+            // `Section(_:content:)` has no bundle parameter, so the header is a
+            // Text built from the SDK's own catalog instead.
+            Section {
                 ForEach(items) { item in
                     MyRequestRow(item: item)
                 }
+            } header: {
+                Text(title)
             }
         }
     }
@@ -168,10 +179,10 @@ public struct FeedbackThreadMyRequestsList: View {
 }
 
 private struct MyRequestsMessage: View {
-    let title: String
-    let message: String
+    let title: LocalizedStringResource
+    let message: LocalizedStringResource
     let systemImage: String
-    var actionTitle: String?
+    var actionTitle: LocalizedStringResource?
     var action: (() -> Void)?
 
     var body: some View {
@@ -186,8 +197,10 @@ private struct MyRequestsMessage: View {
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
             if let actionTitle, let action {
-                Button(actionTitle, action: action)
-                    .buttonStyle(.borderedProminent)
+                Button(action: action) {
+                    Text(actionTitle)
+                }
+                .buttonStyle(.borderedProminent)
             }
         }
         .padding(24)
@@ -210,14 +223,23 @@ private struct MyRequestRow: View {
                     .padding(.vertical, 3)
                     .background(statusColor.opacity(0.12), in: Capsule())
                 if let shippedInVersion = item.shippedInVersion {
-                    Label("Shipped in \(shippedInVersion)", systemImage: "checkmark.circle.fill")
-                        .font(.caption.weight(.medium))
-                        .foregroundStyle(.green)
+                    Label {
+                        Text("Shipped in \(shippedInVersion)", bundle: .module)
+                    } icon: {
+                        Image(systemName: "checkmark.circle.fill")
+                    }
+                    .font(.caption.weight(.medium))
+                    .foregroundStyle(.green)
                 }
                 Spacer()
-                Label("\(item.voteCount)", systemImage: "arrow.up.circle")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                Label {
+                    // Verbatim: a bare count, nothing to translate.
+                    Text(verbatim: "\(item.voteCount)")
+                } icon: {
+                    Image(systemName: "arrow.up.circle")
+                }
+                .font(.caption)
+                .foregroundStyle(.secondary)
             }
         }
         .padding(.vertical, 4)

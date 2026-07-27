@@ -125,6 +125,29 @@ It groups cards into **Waiting for review**, **In progress**, and **Shipped**, a
 
 The client exposes all three calls directly if you're building custom UI: `myRequests(externalUserID:)`, `myUpdates(externalUserID:)`, and `acknowledgeUpdates(ids:externalUserID:)`.
 
+## Localization
+
+The drop-in views ship in **English and Italian** and follow the device's
+language automatically — nothing to configure. A locale the SDK doesn't carry
+falls back to English.
+
+Everything a user reads lives in one String Catalog,
+`Sources/FeedbackThread/Resources/Localizable.xcstrings`. Adding a language is a
+pull request against that file and nothing else: open it in Xcode, add the
+language, translate every key. A test fails if any key is left untranslated or
+if a translation's format specifiers don't match the English ones.
+
+Two things stay untranslated on purpose:
+
+- **Server-supplied text** — request titles and descriptions, error messages
+  from the API, and any request status the SDK doesn't recognize are passed
+  through exactly as received.
+- **Configuration errors** — `FeedbackThreadError.invalidConfiguration` messages
+  are addressed to you while you wire the SDK up, not to your users.
+
+`FeedbackThreadFeedbackKind.title` and `FeedbackThreadRequestTarget.title` remain
+plain English `String`s, unchanged, for custom UI that already renders them.
+
 ### Use the client directly
 
 The SwiftUI views are optional. `FeedbackThreadClient` exposes `submit(_:)`, `requests(externalUserID:)`, and `setVote(for:voted:externalUserID:customerTier:)` if you're building your own UI. Requests time out after a configurable `requestTimeout` (default 30 s).

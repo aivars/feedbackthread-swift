@@ -53,24 +53,29 @@ public struct FeedbackThreadFeedbackForm: View {
         NavigationStack {
             Form {
                 Section {
-                    Picker("Feedback type", selection: $kind) {
+                    Picker(selection: $kind) {
                         ForEach(FeedbackThreadFeedbackKind.submittableCases) { option in
-                            Text(option.title).tag(option)
+                            Text(option.localizedTitle).tag(option)
                         }
+                    } label: {
+                        Text("Feedback type", bundle: .module)
                     }
                     .pickerStyle(.segmented)
                     .onChange(of: kind) { _ in resubmissionKey.contentChanged() }
 
-                    TextField("Short title", text: $title)
+                    // `TextField(_:text:)` takes a `LocalizedStringKey` that would
+                    // resolve against the host app's bundle, so the placeholder is
+                    // resolved here and handed over as a plain String.
+                    TextField(String(localized: "Short title", bundle: .module), text: $title)
                         .textInputAutocapitalization(.sentences)
                         .onChange(of: title) { _ in resubmissionKey.contentChanged() }
 
                     TextEditor(text: $message)
                         .frame(minHeight: 120)
-                        .accessibilityLabel("Feedback details")
+                        .accessibilityLabel(Text("Feedback details", bundle: .module))
                         .onChange(of: message) { _ in resubmissionKey.contentChanged() }
                 } header: {
-                    Text("What would you like to share?")
+                    Text("What would you like to share?", bundle: .module)
                 }
 
                 if case .failed(let errorMessage) = phase {
@@ -82,13 +87,16 @@ public struct FeedbackThreadFeedbackForm: View {
 
                 if phase == .sent {
                     Section {
-                        Label(
-                            kind == .request ? "Request submitted for review." : "Feedback sent. Thank you!",
-                            systemImage: "checkmark.circle.fill"
-                        )
-                            .foregroundStyle(.green)
+                        Label {
+                            Text(confirmationMessage)
+                        } icon: {
+                            Image(systemName: "checkmark.circle.fill")
+                        }
+                        .foregroundStyle(.green)
 
-                        Button("Done") { dismiss() }
+                        Button { dismiss() } label: {
+                            Text("Done", bundle: .module)
+                        }
                     }
                 } else {
                     Section {
@@ -100,7 +108,7 @@ public struct FeedbackThreadFeedbackForm: View {
                                 if phase == .submitting {
                                     ProgressView()
                                 } else {
-                                    Text("Send feedback")
+                                    Text("Send feedback", bundle: .module)
                                 }
                                 Spacer()
                             }
@@ -109,11 +117,13 @@ public struct FeedbackThreadFeedbackForm: View {
                     }
                 }
             }
-            .navigationTitle("Feedback")
+            .navigationTitle(Text("Feedback", bundle: .module))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
+                    Button { dismiss() } label: {
+                        Text("Cancel", bundle: .module)
+                    }
                 }
             }
             .task(id: pendingSubmission?.id) {
@@ -121,6 +131,15 @@ public struct FeedbackThreadFeedbackForm: View {
                 await submit(pendingSubmission)
             }
         }
+    }
+
+    /// A request is moderated before it reaches the public board, a bug report
+    /// isn't - two different promises, so two separate keys rather than one
+    /// sentence with a swapped-out clause.
+    private var confirmationMessage: LocalizedStringResource {
+        kind == .request
+            ? .feedbackThread("Request submitted for review.")
+            : .feedbackThread("Feedback sent. Thank you!")
     }
 
     private var canSubmit: Bool {

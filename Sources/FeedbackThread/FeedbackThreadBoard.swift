@@ -28,13 +28,27 @@ public struct FeedbackThreadBoard: View {
 
         var id: String { rawValue }
 
-        var title: String {
+        var title: LocalizedStringResource {
             switch self {
-            case .all: "All"
-            case .inReview: "In review"
-            case .planned: "Planned"
-            case .inProgress: "In progress"
-            case .completed: "Completed"
+            case .all: .feedbackThread("All")
+            case .inReview: .feedbackThread("In review")
+            case .planned: .feedbackThread("Planned")
+            case .inProgress: .feedbackThread("In progress")
+            case .completed: .feedbackThread("Completed")
+            }
+        }
+
+        /// A whole sentence per filter rather than "No \(title.lowercased())
+        /// requests": lowercasing a status name and dropping it into a slot has
+        /// no correct translation - other languages inflect the adjective, and
+        /// several put it before the noun.
+        var emptyStateTitle: LocalizedStringResource {
+            switch self {
+            case .all: .feedbackThread("No requests")
+            case .inReview: .feedbackThread("No requests in review")
+            case .planned: .feedbackThread("No planned requests")
+            case .inProgress: .feedbackThread("No requests in progress")
+            case .completed: .feedbackThread("No completed requests")
             }
         }
 
@@ -87,13 +101,15 @@ public struct FeedbackThreadBoard: View {
                 filterChipRow
                 content
             }
-            .navigationTitle("Feature requests")
+            .navigationTitle(Text("Feature requests", bundle: .module))
             .navigationBarTitleDisplayMode(.inline)
             .navigationDestination(for: FeatureRequestRoute.self, destination: requestDestination)
             .toolbar {
                 if let onDismiss {
                     ToolbarItem(placement: .cancellationAction) {
-                        Button("Done", action: onDismiss)
+                        Button(action: onDismiss) {
+                            Text("Done", bundle: .module)
+                        }
                     }
                 }
                 ToolbarItem(placement: .topBarTrailing) {
@@ -103,7 +119,7 @@ public struct FeedbackThreadBoard: View {
                     } label: {
                         myRequestsToolbarIcon
                     }
-                    .accessibilityLabel("My requests")
+                    .accessibilityLabel(Text("My requests", bundle: .module))
                 }
             }
             .safeAreaInset(edge: .bottom) {
@@ -143,7 +159,8 @@ public struct FeedbackThreadBoard: View {
         Image(systemName: "person.crop.circle")
             .overlay(alignment: .topTrailing) {
                 if unreadCount > 0 {
-                    Text(unreadCount > 99 ? "99+" : "\(unreadCount)")
+                    // Verbatim: a digit count and an overflow marker, nothing to translate.
+                    Text(verbatim: unreadCount > 99 ? "99+" : "\(unreadCount)")
                         .font(.system(size: 9, weight: .bold))
                         .foregroundStyle(.white)
                         .padding(3)
@@ -168,7 +185,7 @@ public struct FeedbackThreadBoard: View {
         Button {
             activeSheet = .submit
         } label: {
-            Text("Suggest a feature")
+            Text("Suggest a feature", bundle: .module)
                 .font(.headline)
                 .frame(maxWidth: .infinity)
         }
@@ -204,14 +221,16 @@ public struct FeedbackThreadBoard: View {
     private var content: some View {
         switch loadState {
         case .loading where requests.isEmpty:
-            ProgressView("Loading requests…")
+            ProgressView { Text("Loading requests…", bundle: .module) }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         case .failed(let message) where requests.isEmpty:
             FeatureRequestMessage(
-                title: "Couldn’t load requests",
-                message: message,
+                title: .feedbackThread("Couldn’t load requests"),
+                // The error's own description: written by the server or by
+                // URLSession, already localized (or not) at its source.
+                message: .feedbackThreadVerbatim(message),
                 systemImage: "wifi.exclamationmark",
-                actionTitle: "Try again",
+                actionTitle: .feedbackThread("Try again"),
                 action: { Task { await load() } }
             )
         default:
@@ -235,15 +254,31 @@ public struct FeedbackThreadBoard: View {
                 .listStyle(.plain)
                 .overlay {
                     if filteredRequests.isEmpty {
-                        FeatureRequestMessage(
-                            title: requests.isEmpty ? "No feature requests yet" : "No \(selectedFilter.title.lowercased()) requests",
-                            message: requests.isEmpty ? "Be the first to share an idea." : "Choose another status to see more requests.",
-                            systemImage: requests.isEmpty ? "lightbulb" : "line.3.horizontal.decrease.circle"
-                        )
+                        emptyStateMessage
                     }
                 }
                 .refreshable { await load() }
             }
+        }
+    }
+
+    /// Two different empty states: nothing published at all, or nothing left
+    /// after the selected filter. Each branch picks whole sentences rather than
+    /// assembling one, so every language can phrase them its own way.
+    @ViewBuilder
+    private var emptyStateMessage: some View {
+        if requests.isEmpty {
+            FeatureRequestMessage(
+                title: .feedbackThread("No feature requests yet"),
+                message: .feedbackThread("Be the first to share an idea."),
+                systemImage: "lightbulb"
+            )
+        } else {
+            FeatureRequestMessage(
+                title: selectedFilter.emptyStateTitle,
+                message: .feedbackThread("Choose another status to see more requests."),
+                systemImage: "line.3.horizontal.decrease.circle"
+            )
         }
     }
 
@@ -273,8 +308,8 @@ public struct FeedbackThreadBoard: View {
                 )
             } else {
                 FeatureRequestMessage(
-                    title: "Request unavailable",
-                    message: "This request is no longer available on the public board.",
+                    title: .feedbackThread("Request unavailable"),
+                    message: .feedbackThread("This request is no longer available on the public board."),
                     systemImage: "rectangle.slash"
                 )
             }
@@ -342,10 +377,10 @@ public struct FeedbackThreadBoard: View {
 }
 
 private struct FeatureRequestMessage: View {
-    let title: String
-    let message: String
+    let title: LocalizedStringResource
+    let message: LocalizedStringResource
     let systemImage: String
-    var actionTitle: String?
+    var actionTitle: LocalizedStringResource?
     var action: (() -> Void)?
 
     var body: some View {
@@ -360,8 +395,10 @@ private struct FeatureRequestMessage: View {
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
             if let actionTitle, let action {
-                Button(actionTitle, action: action)
-                    .buttonStyle(.borderedProminent)
+                Button(action: action) {
+                    Text(actionTitle)
+                }
+                .buttonStyle(.borderedProminent)
             }
         }
         .padding(24)
@@ -370,14 +407,16 @@ private struct FeatureRequestMessage: View {
 }
 
 private struct FilterChipButton: View {
-    let title: String
+    let title: LocalizedStringResource
     let count: Int
     let isSelected: Bool
     let action: () -> Void
 
     var body: some View {
         Button(action: action) {
-            Text("\(title) (\(count))")
+            // One key for the whole chip rather than gluing the pieces together
+            // here, so a language can reorder or re-punctuate the pair.
+            Text(.feedbackThread("filter.chip", defaultValue: "\(String(localized: title)) (\(count))"))
                 .font(.subheadline.weight(.medium))
                 .padding(.horizontal, 12)
                 .padding(.vertical, 6)
@@ -410,8 +449,8 @@ private struct FeatureRequestRow: View {
                     HStack(alignment: .firstTextBaseline, spacing: 6) {
                         Text(request.title)
                             .font(.headline)
-                        if request.target == .watchOS {
-                            Text("Apple Watch")
+                        if let targetTitle = request.target.localizedTitle {
+                            Text(targetTitle)
                                 .font(.caption2.weight(.semibold))
                                 .foregroundStyle(.blue)
                         }
@@ -422,7 +461,7 @@ private struct FeatureRequestRow: View {
                         .lineLimit(3)
                     HStack(spacing: 6) {
                         if request.kind == .bug {
-                            Text("Bug")
+                            Text("Bug", bundle: .module)
                                 .font(.caption2.weight(.semibold))
                                 .padding(.horizontal, 7)
                                 .padding(.vertical, 2)
@@ -472,10 +511,14 @@ private struct FeatureRequestDetail: View {
                                 ShippedInVersionBadge(version: shippedInVersion)
                             }
                         }
-                        if request.target == .watchOS {
-                            Label("Apple Watch", systemImage: "applewatch")
-                                .font(.subheadline)
-                                .foregroundStyle(.secondary)
+                        if let targetTitle = request.target.localizedTitle {
+                            Label {
+                                Text(targetTitle)
+                            } icon: {
+                                Image(systemName: "applewatch")
+                            }
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
                         }
                     }
                 }
@@ -495,7 +538,7 @@ private struct FeatureRequestDetail: View {
             }
             .padding(20)
         }
-        .navigationTitle("Request")
+        .navigationTitle(Text("Request", bundle: .module))
         .navigationBarTitleDisplayMode(.inline)
     }
 }
@@ -529,12 +572,16 @@ private struct ShippedInVersionBadge: View {
     let version: String
 
     var body: some View {
-        Label("Shipped in \(version)", systemImage: "checkmark.circle.fill")
-            .font(.caption.weight(.medium))
-            .foregroundStyle(.green)
-            .padding(.horizontal, 7)
-            .padding(.vertical, 3)
-            .background(Color.green.opacity(0.12), in: Capsule())
+        Label {
+            Text("Shipped in \(version)", bundle: .module)
+        } icon: {
+            Image(systemName: "checkmark.circle.fill")
+        }
+        .font(.caption.weight(.medium))
+        .foregroundStyle(.green)
+        .padding(.horizontal, 7)
+        .padding(.vertical, 3)
+        .background(Color.green.opacity(0.12), in: Capsule())
     }
 }
 
@@ -558,7 +605,8 @@ private struct FeatureRequestVoteButton: View {
                 .font(.title3.weight(.semibold))
                 .frame(height: 24)
 
-                Text("\(votes)")
+                // Verbatim: a bare count, nothing to translate.
+                Text(verbatim: "\(votes)")
                     .font(.callout.weight(.semibold).monospacedDigit())
             }
             .frame(minWidth: 52)
@@ -569,8 +617,14 @@ private struct FeatureRequestVoteButton: View {
         .buttonStyle(.plain)
         .foregroundStyle(isVoted ? Color.accentColor : .secondary)
         .disabled(isVoting)
-        .accessibilityLabel(isVoted ? "Remove vote" : "Vote")
-        .accessibilityValue("\(votes) votes")
+        .accessibilityLabel(Text(voteAccessibilityLabel))
+        .accessibilityValue(Text(.feedbackThread("\(votes) votes")))
+    }
+
+    /// Two separate keys rather than one with a placeholder: the two states are
+    /// different sentences, and several languages inflect the verb differently.
+    private var voteAccessibilityLabel: LocalizedStringResource {
+        isVoted ? .feedbackThread("Remove vote") : .feedbackThread("Vote")
     }
 
     private var backgroundColor: Color {

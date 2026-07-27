@@ -22,6 +22,17 @@ public enum FeedbackThreadFeedbackKind: String, Codable, CaseIterable, Identifia
         case .review: "Review"
         }
     }
+
+    /// ``title`` resolved through the SDK's String Catalog, for the SDK's own
+    /// views. ``title`` itself stays a plain English `String` so host apps that
+    /// already render it keep the exact value they get today.
+    var localizedTitle: LocalizedStringResource {
+        switch self {
+        case .bug: .feedbackThread("Bug")
+        case .request: .feedbackThread("Request")
+        case .review: .feedbackThread("Review")
+        }
+    }
 }
 
 /// A customer's plan tier, used to prioritize feedback and votes.
@@ -107,6 +118,16 @@ public enum FeedbackThreadRequestTarget: String, Codable, Sendable {
     public var title: String? {
         switch self {
         case .watchOS: "Apple Watch"
+        case .ios, .android: nil
+        }
+    }
+
+    /// ``title`` resolved through the SDK's String Catalog, for the SDK's own
+    /// views. Same non-breaking split as
+    /// ``FeedbackThreadFeedbackKind/localizedTitle``.
+    var localizedTitle: LocalizedStringResource? {
+        switch self {
+        case .watchOS: .feedbackThread("Apple Watch")
         case .ios, .android: nil
         }
     }
@@ -257,10 +278,20 @@ public enum FeedbackThreadError: Error, Equatable, LocalizedError, Sendable {
     case invalidResponse
     case server(statusCode: Int, message: String)
 
+    /// Only the cases an end user can actually hit are translated.
+    ///
+    /// `invalidConfiguration` deliberately stays English: every one of its
+    /// messages is a wiring mistake (bad base URL, missing project key, a stub
+    /// client that can't vote, a missing stable user ID) surfaced to the
+    /// integrator while they wire the SDK up — never copy a user is meant to
+    /// read. Translating it would only make it harder to search for.
+    ///
+    /// `server` is a passthrough: the API wrote that message, and reinterpreting
+    /// it here would be wrong whether or not the API localized it.
     public var errorDescription: String? {
         switch self {
         case .invalidConfiguration(let message): message
-        case .invalidResponse: "FeedbackThread returned an unreadable response."
+        case .invalidResponse: String(localized: "FeedbackThread returned an unreadable response.", bundle: .module)
         case .server(_, let message): message
         }
     }
@@ -467,7 +498,7 @@ private final class FeedbackThreadHTTPTransport: @unchecked Sendable {
             let error = try? decoder.decode(FeedbackThreadErrorEnvelope.self, from: data)
             throw FeedbackThreadError.server(
                 statusCode: httpResponse.statusCode,
-                message: error?.error.message ?? "FeedbackThread returned HTTP \(httpResponse.statusCode)."
+                message: error?.error.message ?? Self.httpStatusMessage(httpResponse.statusCode)
             )
         }
 
@@ -609,6 +640,13 @@ private final class FeedbackThreadHTTPTransport: @unchecked Sendable {
         return result.unreadCount
     }
 
+    /// The fallback message when the API fails without a readable error
+    /// envelope. The only transport-level string an end user can end up
+    /// reading, so it is the only one that goes through the catalog.
+    private static func httpStatusMessage(_ statusCode: Int) -> String {
+        String(localized: "FeedbackThread returned HTTP \(statusCode).", bundle: .module)
+    }
+
     private func projectEndpoint() throws -> URL {
         let projectKey = configuration.projectKey.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !projectKey.isEmpty else {
@@ -634,7 +672,7 @@ private final class FeedbackThreadHTTPTransport: @unchecked Sendable {
             let error = try? decoder.decode(FeedbackThreadErrorEnvelope.self, from: data)
             throw FeedbackThreadError.server(
                 statusCode: httpResponse.statusCode,
-                message: error?.error.message ?? "FeedbackThread returned HTTP \(httpResponse.statusCode)."
+                message: error?.error.message ?? Self.httpStatusMessage(httpResponse.statusCode)
             )
         }
         return data

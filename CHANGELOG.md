@@ -1,5 +1,29 @@
 # Changelog
 
+## Unreleased
+
+The drop-in views are localized, and ship in English and Italian.
+
+- Every user-facing string now lives in a String Catalog
+  (`Sources/FeedbackThread/Resources/Localizable.xcstrings`, 50 keys) resolved
+  against the SDK's own bundle, so the board, the feedback form, and My Requests
+  follow the device's language. Adding a language is a pull request against that
+  one file — a test fails on any key left untranslated, or on a translation whose
+  format specifiers drift from the English.
+- **No API change.** `FeedbackThreadFeedbackKind.title` and
+  `FeedbackThreadRequestTarget.title` are untouched English `String`s; the views
+  moved to internal localized accessors alongside them.
+- The board's empty state is five whole sentences, one per filter, instead of
+  interpolating a lowercased status name into `"No … requests"` — a construction
+  no language other than English can inflect correctly. The votes accessibility
+  value gained a proper plural.
+- Wire strings are deliberately untouched: request statuses on the API
+  (`"Submitted"`, `"In review"`, `"Ready to release"`, …), enum raw values, URL
+  paths, and headers stay exactly as they were, even where a display string reads
+  identically. Server messages and unrecognized statuses are still passed through
+  verbatim, and `FeedbackThreadError.invalidConfiguration` stays English — it
+  addresses the integrator, not the end user.
+
 ## 0.4.1
 
 - Bundles a privacy manifest that declares the SDK's app-local `UserDefaults`

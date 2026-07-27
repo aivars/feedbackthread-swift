@@ -1,3 +1,4 @@
+import Foundation
 import Testing
 @testable import FeedbackThread
 
@@ -20,27 +21,52 @@ struct FeedbackThreadRequestStatusTests {
         #expect(status.feedbackThreadRequestStage == stage)
     }
 
+    // Display labels are resolved through the SDK's String Catalog, so the
+    // expectations resolve the same key the same way rather than hardcoding
+    // English - otherwise these tests would only pass in an English locale.
+    // The catalog key itself is asserted separately, which is what actually
+    // pins the label to a specific piece of copy.
+
     @Test("Labels a Rejected status plainly")
     func labelsRejected() {
-        #expect("Rejected".feedbackThreadRequestLabel == "Rejected")
+        #expect("Rejected".feedbackThreadRequestLabel.key == "Rejected")
+        #expect(
+            String(localized: "Rejected".feedbackThreadRequestLabel)
+                == String(localized: "Rejected", bundle: .feedbackThread)
+        )
     }
 
     @Test("Labels a Submitted status honestly, without implying moderation happened")
     func labelsPendingReview() {
-        #expect("Submitted".feedbackThreadRequestLabel == "Waiting for review")
+        #expect("Submitted".feedbackThreadRequestLabel.key == "Waiting for review")
+        #expect(
+            String(localized: "Submitted".feedbackThreadRequestLabel)
+                == String(localized: "Waiting for review", bundle: .feedbackThread)
+        )
     }
 
     @Test("Preserves a fabricated, unrecognized status rather than dropping it")
     func preservesUnknownStatus() {
         let status = "archived"
         #expect(status.feedbackThreadRequestStage == .unknown("archived"))
-        #expect(status.feedbackThreadRequestLabel == "Archived")
+        // A status this SDK version doesn't know is a value the server invented:
+        // it has no translation and must come back exactly as capitalized, in
+        // every locale.
+        #expect(String(localized: status.feedbackThreadRequestLabel) == "Archived")
     }
 
     @Test("Sensibly capitalizes an unrecognized status with separators")
     func capitalizesUnknownStatusWithSeparators() {
-        #expect("on_hold".feedbackThreadRequestLabel == "On Hold")
-        #expect("NEEDS-TRIAGE".feedbackThreadRequestLabel == "Needs Triage")
+        #expect(String(localized: "on_hold".feedbackThreadRequestLabel) == "On Hold")
+        #expect(String(localized: "NEEDS-TRIAGE".feedbackThreadRequestLabel) == "Needs Triage")
+    }
+
+    @Test("Routes an unrecognized status around the catalog entirely")
+    func unknownStatusNeverBecomesACatalogKey() {
+        // The verbatim wrapper's key is the "%@" format, never the value, so a
+        // server-invented status can't collide with (or be shadowed by) a
+        // translated key.
+        #expect("archived".feedbackThreadRequestLabel.key == "%@")
     }
 
     @Test(
