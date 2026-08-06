@@ -183,7 +183,24 @@ struct LocalizationCatalogTests {
         #expect(String(localized: .feedbackThreadVerbatim("Nothing to see here")) == "Nothing to see here")
     }
 
-    @Test("Ships every language the catalog declares in the built resource bundle")
+    /// Whatever else a build system does with the catalog, it has to put it in
+    /// the bundle - which is what `resources: [.process("Resources")]` is for.
+    /// Compiled into `.lproj` or copied verbatim both count here; the difference
+    /// is ``CompiledCatalog``'s problem.
+    @Test("Ships the catalog in the built resource bundle")
+    func bundleShipsTheCatalog() {
+        let compiled = CompiledCatalog.isAvailable
+        let copied = Bundle.feedbackThread.url(forResource: "Localizable", withExtension: "xcstrings") != nil
+        #expect(
+            compiled || copied,
+            "the resource bundle at \(Bundle.feedbackThread.bundleURL.lastPathComponent) has neither compiled .lproj resources nor a copied Localizable.xcstrings"
+        )
+    }
+
+    @Test(
+        "Ships every language the catalog declares in the built resource bundle",
+        .enabled(if: CompiledCatalog.isAvailable, .init(rawValue: CompiledCatalog.unavailableReason))
+    )
     func bundleShipsEveryLanguage() {
         let shipped = Set(Bundle.feedbackThread.localizations)
         #expect(
