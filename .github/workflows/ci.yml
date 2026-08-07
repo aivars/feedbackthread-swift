@@ -25,9 +25,17 @@ jobs:
 
       # The pass that actually compiles the SwiftUI views. A broken preview
       # fixture once shipped because only the macOS test run was gating it.
+      #
+      # xcodebuild, not `swift build -Xswiftc -sdk`: that flag does not reliably
+      # reach the compiler across build systems. On 6.3.3 it silently fell back
+      # to the macOS sysroot and failed on `cannot load underlying module for
+      # UIKit`, while passing on 6.4 locally. xcodebuild is also how a host app
+      # actually builds this package, and it compiles the String Catalog on the
+      # way through, which a plain `swift build` on the native engine does not.
       - name: iOS simulator build
         run: |
-          SDKPATH=$(xcrun --sdk iphonesimulator --show-sdk-path)
-          swift build \
-            -Xswiftc -sdk -Xswiftc "$SDKPATH" \
-            -Xswiftc -target -Xswiftc arm64-apple-ios16.0-simulator
+          xcodebuild build \
+            -scheme FeedbackThread \
+            -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath .build/dd \
+            -skipMacroValidation
