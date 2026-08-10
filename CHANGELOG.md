@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.4.2
 
 The drop-in views are localized, and ship in English and Italian.
 

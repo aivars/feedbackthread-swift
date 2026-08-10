@@ -33,7 +33,7 @@ In Xcode: **File → Add Package Dependencies…** and enter
 https://github.com/aivars/feedbackthread-swift.git
 ```
 
-Choose **Up to Next Major Version** from `0.4.1` and add the `FeedbackThread` product.
+Choose **Up to Next Major Version** from `0.4.2` and add the `FeedbackThread` product.
 
 ## Quick start
 
