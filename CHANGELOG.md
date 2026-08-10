@@ -24,6 +24,10 @@ The drop-in views are localized, and ship in English and Italian.
   verbatim, and `FeedbackThreadError.invalidConfiguration` stays English — it
   addresses the integrator, not the end user.
 
+Contributed by [@smashkins](https://github.com/smashkins) in
+[#5](https://github.com/aivars/feedbackthread-swift/pull/5), including the
+Italian translation.
+
 ## 0.4.1
 
 - Bundles a privacy manifest that declares the SDK's app-local `UserDefaults`
