@@ -205,6 +205,12 @@ public struct FeedbackThreadMyRequest: Decodable, Equatable, Identifiable, Senda
     public let createdAt: String
     public let voteCount: Int
     public let shippedInVersion: String?
+    public let conversationAvailable: Bool?
+    public init(id: String, title: String, status: String, createdAt: String, voteCount: Int, shippedInVersion: String?, conversationAvailable: Bool? = nil) {
+        self.id = id; self.title = title; self.status = status; self.createdAt = createdAt
+        self.voteCount = voteCount; self.shippedInVersion = shippedInVersion; self.conversationAvailable = conversationAvailable
+    }
+
 }
 
 /// A shipped card of the caller's own that hasn't been acknowledged yet (see
@@ -230,6 +236,7 @@ public struct FeedbackThreadConfiguration: Equatable, Sendable {
     public var baseURL: URL
     public var projectKey: String
     public var source: String
+    public var customerSession: FeedbackThreadCustomerSession?
     public var requestTimeout: TimeInterval
 
     /// The hosted FeedbackThread API. Every configuration defaults to it;
@@ -253,7 +260,8 @@ public struct FeedbackThreadConfiguration: Equatable, Sendable {
         baseURL: URL = FeedbackThreadConfiguration.defaultBaseURL,
         projectKey: String,
         source: String = FeedbackThreadConfiguration.defaultSource,
-        requestTimeout: TimeInterval = 30
+        requestTimeout: TimeInterval = 30,
+        customerSession: FeedbackThreadCustomerSession? = nil
     ) throws {
         guard let scheme = baseURL.scheme?.lowercased(), scheme == "http" || scheme == "https" else {
             throw FeedbackThreadError.invalidConfiguration("The FeedbackThread base URL must use HTTP or HTTPS.")
@@ -270,6 +278,7 @@ public struct FeedbackThreadConfiguration: Equatable, Sendable {
         self.projectKey = projectKey
         self.source = source
         self.requestTimeout = requestTimeout
+        self.customerSession = customerSession
     }
 }
 
@@ -316,6 +325,9 @@ public struct FeedbackThreadClient: Sendable {
         _ externalUserID: String
     ) async throws -> Int
 
+    let conversationConfiguration: FeedbackThreadConfiguration?
+    let conversationSession: URLSession?
+
     private let submissionHandler: SubmissionHandler
     private let requestListHandler: RequestListHandler
     private let voteHandler: VoteHandler
@@ -344,6 +356,8 @@ public struct FeedbackThreadClient: Sendable {
         configuration: FeedbackThreadConfiguration,
         session: URLSession = .shared
     ) {
+        conversationConfiguration = configuration
+        conversationSession = session
         let transport = FeedbackThreadHTTPTransport(configuration: configuration, session: session)
         submissionHandler = { submission, idempotencyKey in
             try await transport.submit(submission, idempotencyKey: idempotencyKey)
@@ -371,6 +385,7 @@ public struct FeedbackThreadClient: Sendable {
     }
 
     public init(submit: @escaping SubmissionHandler) {
+        conversationConfiguration = nil; conversationSession = nil
         submissionHandler = submit
         requestListHandler = { _ in [] }
         voteHandler = { _, _, _, _ in
@@ -393,6 +408,7 @@ public struct FeedbackThreadClient: Sendable {
             throw FeedbackThreadError.invalidConfiguration("This FeedbackThread client does not support acknowledging updates.")
         }
     ) {
+        conversationConfiguration = nil; conversationSession = nil
         submissionHandler = submit
         requestListHandler = requests
         voteHandler = setVote
@@ -489,18 +505,7 @@ private final class FeedbackThreadHTTPTransport: @unchecked Sendable {
         request.setValue(idempotencyKey, forHTTPHeaderField: "Idempotency-Key")
         request.httpBody = try encoder.encode(FeedbackThreadIngestionPayload(submission: submission, source: source))
 
-        let (data, response) = try await session.data(for: request)
-        guard let httpResponse = response as? HTTPURLResponse else {
-            throw FeedbackThreadError.invalidResponse
-        }
-
-        guard (200..<300).contains(httpResponse.statusCode) else {
-            let error = try? decoder.decode(FeedbackThreadErrorEnvelope.self, from: data)
-            throw FeedbackThreadError.server(
-                statusCode: httpResponse.statusCode,
-                message: error?.error.message ?? Self.httpStatusMessage(httpResponse.statusCode)
-            )
-        }
+        let data = try await responseData(for: request)
 
         guard let envelope = try? decoder.decode(FeedbackThreadFeedbackEnvelope.self, from: data) else {
             throw FeedbackThreadError.invalidResponse
@@ -664,6 +669,11 @@ private final class FeedbackThreadHTTPTransport: @unchecked Sendable {
     }
 
     private func responseData(for request: URLRequest) async throws -> Data {
+        var request = request
+        if let identity = configuration.customerSession {
+            request.setValue(identity.token, forHTTPHeaderField: "X-FeedbackThread-Customer")
+            request.setValue(identity.externalUserId, forHTTPHeaderField: "X-FeedbackThread-User")
+        }
         let (data, response) = try await session.data(for: request)
         guard let httpResponse = response as? HTTPURLResponse else {
             throw FeedbackThreadError.invalidResponse

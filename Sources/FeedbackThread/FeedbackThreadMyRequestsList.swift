@@ -12,12 +12,19 @@ public struct FeedbackThreadMyRequestsList: View {
         case failed(String)
     }
 
+    @Environment(\.feedbackThreadConversations) private var inheritedConversations
+    private let suppliedConversations: FeedbackThreadConversations?
+    private var conversations: FeedbackThreadConversations? {
+        let value = suppliedConversations ?? inheritedConversations
+        return value?.matches(client) == true ? value : nil
+    }
     private let client: FeedbackThreadClient
     private let externalUserID: String?
     private let onDismiss: (() -> Void)?
     private let onUnreadCountChange: ((Int) -> Void)?
 
     @AppStorage("com.feedbackthread.sdk.voter-id") private var storedVoterID = ""
+    @State private var conversationLoadError: String?
     @State private var myRequests: [FeedbackThreadMyRequest] = []
     @State private var loadState: LoadState = .loading
 
@@ -34,8 +41,10 @@ public struct FeedbackThreadMyRequestsList: View {
         client: FeedbackThreadClient,
         externalUserID: String? = nil,
         onDismiss: (() -> Void)? = nil,
-        onUnreadCountChange: ((Int) -> Void)? = nil
+        onUnreadCountChange: ((Int) -> Void)? = nil,
+        conversations: FeedbackThreadConversations? = nil
     ) {
+        self.suppliedConversations = conversations
         self.client = client
         self.externalUserID = externalUserID
         self.onDismiss = onDismiss
@@ -94,6 +103,7 @@ public struct FeedbackThreadMyRequestsList: View {
             )
         default:
             List {
+                if let conversationLoadError { Text(conversationLoadError).font(.footnote).foregroundStyle(.secondary) }
                 myRequestsSection(title: .feedbackThread("Waiting for review"), items: pendingReviewItems)
                 myRequestsSection(title: .feedbackThread("In progress"), items: inProgressItems)
                 myRequestsSection(title: .feedbackThread("Shipped"), items: shippedItems)
@@ -123,7 +133,9 @@ public struct FeedbackThreadMyRequestsList: View {
             // Text built from the SDK's own catalog instead.
             Section {
                 ForEach(items) { item in
-                    MyRequestRow(item: item)
+                    if let conversations, item.conversationAvailable == true {
+                        NavigationLink { FeedbackThreadConversationView(conversations: conversations, feedbackId: item.id, audience: .private) } label: { MyRequestRow(item: item) }
+                    } else { MyRequestRow(item: item) }
                 }
             } header: {
                 Text(title)
@@ -149,13 +161,23 @@ public struct FeedbackThreadMyRequestsList: View {
 
     @MainActor
     private func load() async {
+        conversationLoadError = nil
         if myRequests.isEmpty { loadState = .loading }
         do {
             async let requestsTask = client.myRequests(externalUserID: voterID)
             async let updatesTask = client.myUpdates(externalUserID: voterID)
-            let (requests, updates) = try await (requestsTask, updatesTask)
+            let (requests, legacyUpdates) = try await (requestsTask, updatesTask)
+            var updates = legacyUpdates
             guard !Task.isCancelled else { return }
             myRequests = requests
+            if let conversations {
+                do {
+                    myRequests = try await conversations.myRequests(including: client, externalUserID: voterID)
+                    updates = try await conversations.myUpdates(including: client, externalUserID: voterID)
+                }
+                catch is CancellationError { return }
+                catch { conversationLoadError = "Your earlier requests are shown. Couldn’t load newer requests; pull to refresh." }
+            }
             loadState = .loaded
             onUnreadCountChange?(updates.unreadCount)
             // Viewing this list is the acknowledgement: once the caller has
@@ -165,8 +187,9 @@ public struct FeedbackThreadMyRequestsList: View {
             if !updates.updates.isEmpty {
                 let ids = updates.updates.map(\.id)
                 Task {
-                    let remaining = (try? await client.acknowledgeUpdates(ids: ids, externalUserID: voterID))
-                        ?? updates.unreadCount
+                    let remaining: Int
+                    if let conversations { remaining = (try? await conversations.acknowledgeUpdates(ids: ids, including: client, externalUserID: voterID)) ?? updates.unreadCount }
+                    else { remaining = (try? await client.acknowledgeUpdates(ids: ids, externalUserID: voterID)) ?? updates.unreadCount }
                     onUnreadCountChange?(remaining)
                 }
             }

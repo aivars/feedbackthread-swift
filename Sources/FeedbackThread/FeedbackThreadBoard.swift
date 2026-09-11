@@ -65,6 +65,12 @@ public struct FeedbackThreadBoard: View {
         }
     }
 
+    @Environment(\.feedbackThreadConversations) private var inheritedConversations
+    private let suppliedConversations: FeedbackThreadConversations?
+    private var conversations: FeedbackThreadConversations? {
+        let value = suppliedConversations ?? inheritedConversations
+        return value?.matches(client) == true ? value : nil
+    }
     private let client: FeedbackThreadClient
     private let appVersion: String?
     private let externalUserID: String?
@@ -86,8 +92,10 @@ public struct FeedbackThreadBoard: View {
         appVersion: String? = nil,
         externalUserID: String? = nil,
         customerTierProvider: (() -> FeedbackThreadCustomerTier?)? = nil,
-        onDismiss: (() -> Void)? = nil
+        onDismiss: (() -> Void)? = nil,
+        conversations: FeedbackThreadConversations? = nil
     ) {
+        self.suppliedConversations = conversations
         self.client = client
         self.appVersion = appVersion
         self.externalUserID = externalUserID
@@ -105,6 +113,11 @@ public struct FeedbackThreadBoard: View {
             .navigationBarTitleDisplayMode(.inline)
             .navigationDestination(for: FeatureRequestRoute.self, destination: requestDestination)
             .toolbar {
+                if let conversations {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        FeedbackThreadMessagesLink(conversations: conversations)
+                    }
+                }
                 if let onDismiss {
                     ToolbarItem(placement: .cancellationAction) {
                         Button(action: onDismiss) {
@@ -126,6 +139,7 @@ public struct FeedbackThreadBoard: View {
                 addRequestButton
             }
         }
+        .environment(\.feedbackThreadConversations, conversations)
         .task {
             ensureVoterID()
             await load()
@@ -147,7 +161,8 @@ public struct FeedbackThreadBoard: View {
                     client: client,
                     externalUserID: externalUserID,
                     onDismiss: { activeSheet = nil },
-                    onUnreadCountChange: { unreadCount = $0 }
+                    onUnreadCountChange: { unreadCount = $0 },
+                    conversations: conversations
                 )
             }
         }
@@ -304,7 +319,8 @@ public struct FeedbackThreadBoard: View {
                     request: request,
                     isVoting: votingIDs.contains(request.id),
                     errorMessage: voteErrorMessage,
-                    onVote: { toggleVote(request) }
+                    onVote: { toggleVote(request) },
+                    conversations: conversations
                 )
             } else {
                 FeatureRequestMessage(
@@ -347,7 +363,10 @@ public struct FeedbackThreadBoard: View {
     // should ever surface an error or block the board from loading.
     @MainActor
     private func refreshUnreadCount() async {
-        guard let result = try? await client.myUpdates(externalUserID: voterID) else { return }
+        let result: FeedbackThreadMyUpdatesResult?
+        if let conversations { result = try? await conversations.myUpdates(including: client, externalUserID: voterID) }
+        else { result = try? await client.myUpdates(externalUserID: voterID) }
+        guard let result else { return }
         unreadCount = result.unreadCount
     }
 
@@ -488,6 +507,7 @@ private struct FeatureRequestDetail: View {
     let isVoting: Bool
     var errorMessage: String?
     let onVote: () -> Void
+    let conversations: FeedbackThreadConversations?
 
     var body: some View {
         ScrollView {
@@ -529,6 +549,9 @@ private struct FeatureRequestDetail: View {
                         .foregroundStyle(.red)
                 }
 
+                if let conversations {
+                    FeedbackThreadCommentsLink(conversations: conversations, feedbackId: request.id)
+                }
                 Divider()
 
                 Text(request.description)

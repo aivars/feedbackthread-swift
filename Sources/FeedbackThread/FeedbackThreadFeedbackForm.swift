@@ -20,6 +20,7 @@ public struct FeedbackThreadFeedbackForm: View {
         let submission: FeedbackThreadFeedbackSubmission
     }
 
+    @Environment(\.feedbackThreadConversations) private var conversations
     @Environment(\.dismiss) private var dismiss
 
     private let client: FeedbackThreadClient
@@ -174,7 +175,10 @@ public struct FeedbackThreadFeedbackForm: View {
     @MainActor
     private func submit(_ pending: PendingSubmission) async {
         do {
-            let feedback = try await client.submit(pending.submission, idempotencyKey: pending.idempotencyKey)
+            let submissionClient: FeedbackThreadClient
+            if let conversations, conversations.matches(client) { submissionClient = try await conversations.makeClient() }
+            else { submissionClient = client }
+            let feedback = try await submissionClient.submit(pending.submission, idempotencyKey: pending.idempotencyKey)
             guard !Task.isCancelled else { return }
             phase = .sent
             resubmissionKey.submissionSucceeded()

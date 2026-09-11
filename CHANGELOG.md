@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.5.0 — 2026-09-11
+
+- Add customer conversations: secure guest credentials, private
+  replies, public comments, history/read cursors, live inbox updates, foreground
+  banners, and native APNs registration/routing hooks.
+- Preserve all existing client/view initializers and legacy requests, voting,
+  release updates, and acknowledgement behavior. One root hook supplies the
+  conversation session to existing SDK views; no board replacement required.
+- Add `FeedbackThreadConversations(client:)` and `handleNotification(_:)` for
+  incremental adoption. Custom handler clients keep their existing behavior.
+- Private replies and notifications are always enabled. Public comments follow
+  server settings, default off, and disappear live when disabled in the dashboard.
+- Add Messages and Comments entry points to the board and private conversation
+  links to eligible My requests rows.
+- Add a visible Messages unread badge and a compact notification control.
+- New conversation screens currently use English. Guest identity remains
+  installation/account-scope based; cross-device recovery is not included.
+
+
 ## 0.4.2
 
 The drop-in views are localized, and ship in English and Italian.

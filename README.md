@@ -33,7 +33,7 @@ In Xcode: **File → Add Package Dependencies…** and enter
 https://github.com/aivars/feedbackthread-swift.git
 ```
 
-Choose **Up to Next Major Version** from `0.4.2` and add the `FeedbackThread` product.
+Choose **Up to Next Major Version** from `0.5.0` and add the `FeedbackThread` product.
 
 ## Quick start
 
@@ -170,3 +170,86 @@ locale needs no Swift changes at all.
 ## License
 
 MIT — see [LICENSE](LICENSE).
+
+
+## Conversations (0.5.0+)
+
+Existing `FeedbackThreadClient`, board, form, request, voting, and release-update
+APIs remain supported. Updating the package alone does not change their identity
+or require replacing an initializer. Deploy the matching backend migrations
+before adopting the new conversation hook. The hosted service supports these endpoints. Existing SDK integrations remain compatible.
+
+Private replies and notifications are enabled for every project. They have no
+on/off switch. Public comments are off by default; developers can enable them
+under **SDK setup → Replies, comments & notifications**. Turning them off hides
+public discussion and blocks new comments on the server, without deleting history
+or affecting requests, votes, or private replies. No email is needed.
+
+### Add the conversation hook
+
+Keep the existing client and board. Create one conversation object in your app
+model with `try FeedbackThreadConversations(client: feedbackThread)`, then attach
+it at the root above your feedback presentation:
+
+```swift
+// feedbackThread is your existing HTTP client.
+// Retain conversations in your app model or a StateObject; do not recreate it
+// during every body evaluation. Handle the throwing initializer at app setup.
+let conversations = try FeedbackThreadConversations(client: feedbackThread)
+
+RootView()
+    .feedbackThreadConversations(conversations)
+
+// Your existing sheet's content is unchanged:
+FeedbackThreadBoard(client: feedbackThread)
+```
+
+The root hook supplies the session to SDK views. It owns foreground connection
+lifetime, banners, and notification-tap presentation. Forms under that root attach
+secure conversation identity to new submissions. The board keeps existing voting
+identity, and My requests combines legacy and new submissions without claiming
+old requests. Existing release updates and acknowledgements remain available.
+Custom handler clients remain unchanged; they require a separate HTTP conversation
+client for new features. Different-project clients do not inherit this session.
+
+For custom UI or submissions outside SDK forms, `makeClient()` returns an
+authenticated client. Keep the original client for legacy request history. The
+standalone conversation and Messages views can also be embedded in navigation.
+Observe `unreadCount` or set `onUnreadCountChange` for an app-owned feedback badge.
+
+### Finish push setup
+
+Notifications are enabled by default; provider configuration and user permission
+are required for background delivery. The dashboard distinguishes **Setup needed**
+(no APNs credentials), **App integration needed** (no registered devices), and
+**Configured**. Configured does not prove delivery or a read.
+
+1. Add the app's APNs bundle ID, team ID, key ID, and `.p8` key in the dashboard.
+2. Keep your app's notification permission flow. After consent, register with APNs.
+3. Forward the device token with `try await conversations.registerDeviceToken(deviceToken)`.
+   Retry registration on failure. This must also work for users without an app login.
+4. In your existing notification delegate's tap handler, call
+   `conversations.handleNotification(response.notification.request.content.userInfo)`
+   on the main actor. It returns true for a FeedbackThread payload; false leaves
+   unrelated notifications to the host. Always finish the delegate callback.
+5. In the foreground, let the SDK render reply banners instead of also showing
+   a system alert for the same FeedbackThread notification.
+
+The SDK does not replace notification delegates, automatically prompt for
+permission, or add a third-party push dependency. Test foreground, background,
+terminated launch/tap, denied permission, and token registration on a real device.
+Messages still appear in the conversation when push permission is denied.
+
+### Identity and migration limits
+
+Sessions are server-issued guests stored in Keychain. `accountScope` is a local
+namespace, not verified host-account authentication. Cross-device recovery and
+host-server identity exchange are not included in this release. For account switching,
+replace the conversation object with a scope for that account and revoke/clear
+it on logout with `logout()`; handle errors and stop using the old authenticated
+client. Legacy history remains governed by the original client/external user ID.
+
+Historical feedback without secure conversation identity remains readable but
+has no private reply link. The SDK does not silently claim it. New conversation
+UI copy is English pending localization QA. A message marked **Posted** is saved;
+**Read** requires the other participant's read cursor, not a push response.

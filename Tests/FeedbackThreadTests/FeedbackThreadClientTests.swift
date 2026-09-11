@@ -576,6 +576,94 @@ struct FeedbackThreadClientTests {
         )
     }
 
+    @Test("Conversation-enabled requests carry the credential and server identity")
+    func conversationIdentity() async throws {
+        let identity = FeedbackThreadCustomerSession(customerId: "customer", externalUserId: "ft-guest:customer", token: "test-customer-credential")
+        let recorder = RequestRecorder { request in
+            #expect(request.value(forHTTPHeaderField: "X-FeedbackThread-Customer") == identity.token)
+            #expect(request.value(forHTTPHeaderField: "X-FeedbackThread-User") == identity.externalUserId)
+            return try response(statusCode: 201, json: ["feedback": sampleFeedback()])
+        }
+        let client = FeedbackThreadClient(configuration: try FeedbackThreadConfiguration(baseURL: URL(string: "https://example.com")!, projectKey: "project-key", customerSession: identity), session: recorder.session)
+        _ = try await client.submit(.init(kind: .request, title: "Question", text: "Details", externalUserID: "untrusted-id"))
+    }
+
+    @MainActor
+    @Test("Conversation history uses the scoped API without marking messages read")
+    func conversationHistory() async throws {
+        let identity = FeedbackThreadCustomerSession(customerId: "customer", externalUserId: "ft-guest:customer", token: "test-customer-credential")
+        let recorder = RequestRecorder { request in
+            #expect(request.httpMethod == "GET")
+            #expect(request.url?.path == "/v1/projects/project-key/chat/threads/FDBK-1/private")
+            #expect(request.value(forHTTPHeaderField: "X-FeedbackThread-Customer") == identity.token)
+            return try response(statusCode: 200, json: ["thread": ["id": "FDBK-1:private", "audience": "private", "status": "waiting"], "messages": [], "unreadCount": 1, "following": true, "hasMore": false])
+        }
+        let configuration = try FeedbackThreadConfiguration(baseURL: URL(string: "https://example.com")!, projectKey: "project-key", customerSession: identity)
+        let chat = FeedbackThreadConversations(configuration: configuration, session: recorder.session)
+        let history = try await chat.history(feedbackId: "FDBK-1", audience: .private)
+        #expect(history.unreadCount == 1)
+    }
+
+    @Test("Push routing rejects malformed payloads and preserves the private audience")
+    func conversationRouting() {
+        #expect(FeedbackThreadConversationRoute(notification: ["feedbackId": "FDBK-1", "audience": "private"]) == .init(feedbackId: "FDBK-1", audience: .private))
+        #expect(FeedbackThreadConversationRoute(notification: ["feedbackId": "FDBK-1", "audience": "internal"]) == nil)
+        #expect(FeedbackThreadConversationRoute(notification: ["feedbackId": "", "audience": "public"]) == nil)
+    }
+
+    @MainActor
+    @Test("Conversation adoption preserves the existing client identity and request history")
+    func conversationAdoptionCompatibility() async throws {
+        let identity = FeedbackThreadCustomerSession(customerId: "customer", externalUserId: "ft-guest:customer", token: "test-customer-credential")
+        let recorder = RequestRecorder { request in
+            let authenticated = request.value(forHTTPHeaderField: "X-FeedbackThread-Customer") != nil
+            if !authenticated { #expect(request.value(forHTTPHeaderField: "X-FeedbackThread-User") == "legacy-user") }
+            if request.url?.path.hasSuffix("/my/requests") == true {
+                var row = sampleMyRequest(id: authenticated ? "new-request" : "legacy-request")
+                row["conversationAvailable"] = authenticated
+                return try response(statusCode: 200, json: ["requests": [row]])
+            }
+            return try response(statusCode: 200, json: ["updates": [["id": authenticated ? "new-request" : "legacy-request", "title": "Shipped", "shippedVersion": "2", "publishedAt": "2026-09-11"]], "unreadCount": 1])
+        }
+        let config = try FeedbackThreadConfiguration(baseURL: URL(string: "https://example.com")!, projectKey: "project-key")
+        let existing = FeedbackThreadClient(configuration: config, session: recorder.session)
+        var chatConfig = config; chatConfig.customerSession = identity
+        let chat = FeedbackThreadConversations(configuration: chatConfig, session: recorder.session)
+        let merged = try await chat.myRequests(including: existing, externalUserID: "legacy-user")
+        #expect(Set(merged.map(\.id)) == ["legacy-request", "new-request"])
+        #expect(merged.first { $0.id == "legacy-request" }?.conversationAvailable == false)
+        #expect(merged.first { $0.id == "new-request" }?.conversationAvailable == true)
+        #expect(try await chat.myUpdates(including: existing, externalUserID: "legacy-user").unreadCount == 2)
+        #expect(try await existing.myRequests(externalUserID: "legacy-user").map(\.id) == ["legacy-request"])
+        let adopted = try FeedbackThreadConversations(client: existing)
+        #expect(adopted.matches(existing))
+        #expect(adopted.notificationsEnabled && adopted.privateRepliesEnabled)
+        #expect(!adopted.publicCommentsEnabled)
+        #expect(!adopted.matches(FeedbackThreadClient(projectKey: "another-project")))
+    }
+
+    @MainActor
+    @Test("Remote settings hide comments and remove stale public inbox entries without disabling replies")
+    func remoteConversationSettings() async throws {
+        let identity = FeedbackThreadCustomerSession(customerId: "customer", externalUserId: "ft-guest:customer", token: "test-customer-credential")
+        let recorder = RequestRecorder { request in
+            if request.url?.path.hasSuffix("/settings") == true {
+                return try response(statusCode: 200, json: ["publicCommentsEnabled": false, "privateRepliesEnabled": true, "notificationsEnabled": true])
+            }
+            return try response(statusCode: 200, json: ["conversations": [], "unreadCount": 0])
+        }
+        let config = try FeedbackThreadConfiguration(baseURL: URL(string: "https://example.com")!, projectKey: "project-key", customerSession: identity)
+        let chat = FeedbackThreadConversations(configuration: config, session: recorder.session)
+        chat.presentedConversation = .init(feedbackId: "public", audience: .public)
+        try await chat.refresh()
+        #expect(chat.settingsLoaded && !chat.publicCommentsEnabled)
+        #expect(chat.presentedConversation == nil)
+        #expect(chat.notificationsEnabled && chat.privateRepliesEnabled)
+        #expect(chat.handleNotification(["feedbackThread": ["feedbackId": "private", "audience": "private"]]))
+        #expect(chat.presentedConversation?.audience == .private)
+        #expect(!chat.handleNotification(["unrelated": "notification"]))
+    }
+
     @Test("Submits through the live staging service when configured")
     func liveSubmission() async throws {
         let environment = ProcessInfo.processInfo.environment
