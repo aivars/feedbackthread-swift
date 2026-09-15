@@ -33,7 +33,7 @@ In Xcode: **File → Add Package Dependencies…** and enter
 https://github.com/aivars/feedbackthread-swift.git
 ```
 
-Choose **Up to Next Major Version** from `0.5.0` and add the `FeedbackThread` product.
+Choose **Up to Next Major Version** from `0.5.1` and add the `FeedbackThread` product.
 
 ## Quick start
 
@@ -254,7 +254,7 @@ has no private reply link. The SDK does not silently claim it. New conversation
 UI copy is English pending localization QA. A message marked **Posted** is saved;
 **Read** requires the other participant's read cursor, not a push response.
 
-### Unreleased conversation fixes
+### Conversation fixes in 0.5.1
 
 A logged-out `FeedbackThreadConversations` object now stays closed. Retain it to
 retry a failed remote revocation, then replace it for the next account. Late
