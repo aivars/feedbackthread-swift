@@ -21,6 +21,8 @@ public final class FeedbackThreadConversations: ObservableObject {
     private let configuration: FeedbackThreadConfiguration
     private let transport: URLSession
     private let account: String
+    private var closed = false
+    private var revocationCustomer: FeedbackThreadCustomerSession?
     private var customer: FeedbackThreadCustomerSession?
     private var pendingSession: Task<FeedbackThreadCustomerSession, Error>?
     private var socket: URLSessionWebSocketTask?
@@ -45,13 +47,15 @@ public final class FeedbackThreadConversations: ObservableObject {
         self.init(configuration: configuration, accountScope: accountScope, session: session)
     }
     public func prepare() async throws -> FeedbackThreadCustomerSession {
+        guard !closed else { throw CancellationError() }
         if let customer { return customer }
         if let pendingSession { return try await pendingSession.value }
         if let saved = try FeedbackThreadConversationCredentials.load(account: account) { customer = saved; return saved }
         let currentGeneration = generation
         let task = Task { @MainActor in
             let request = try makeRequest(path: "/session", method: "POST", data: Data("{}".utf8), authenticated: false)
-            let value: FeedbackThreadCustomerSession = try await decode(request)
+            let value: FeedbackThreadCustomerSession = try await decode(request, allowSessionChange: true)
+            revocationCustomer = value
             try Task.checkCancellation()
             guard generation == currentGeneration else { throw CancellationError() }
             try FeedbackThreadConversationCredentials.save(value, account: account)
@@ -75,7 +79,8 @@ public final class FeedbackThreadConversations: ObservableObject {
     }
     public func send(_ body: String, feedbackId: String, audience: FeedbackThreadConversationAudience, clientId: String) async throws {
         try await mutate(path: threadPath(feedbackId, audience) + "/messages", method: "POST", values: ["body": body, "clientId": clientId])
-        try await refresh()
+        // A failed refresh must not turn a durable send into an apparent failure.
+        do { try await refresh() } catch { errorMessage = error.localizedDescription }
     }
     public func markRead(seq: Int, feedbackId: String, audience: FeedbackThreadConversationAudience) async throws {
         try await mutate(path: threadPath(feedbackId, audience) + "/read", method: "POST", values: ["seq": seq])
@@ -97,15 +102,28 @@ public final class FeedbackThreadConversations: ObservableObject {
     /// Stop live updates, revoke this guest session, and clear local credentials.
     /// Do not reuse an old makeClient() result after signing out.
     public func logout() async throws {
-        generation += 1; pendingSession?.cancel(); socket?.cancel(with: .goingAway, reason: nil)
-        customer = try customer ?? FeedbackThreadConversationCredentials.load(account: account)
-        let request = customer == nil ? nil : try makeRequest(path: "/session", method: "DELETE", data: Data("{}".utf8))
-        try FeedbackThreadConversationCredentials.remove(account: account)
-        publicCommentsEnabled = false; settingsLoaded = false
-        customer = nil; inbox = []; unreadCount = 0; banner = nil; presentedConversation = nil; activeConversation = nil
+        closed = true
+        generation += 1
+        socket?.cancel(with: .goingAway, reason: nil)
+        inbox = []; unreadCount = 0; banner = nil; presentedConversation = nil; activeConversation = nil
+        publicCommentsEnabled = false; settingsLoaded = false; revision += 1
         onUnreadCountChange?(0)
-        if let request { struct Result: Decodable { let ok: Bool }; let _: Result = try await decode(request) }
+        // Await an issued credential so even a logout during creation revokes it.
+        if let pendingSession { _ = try? await pendingSession.value }
+        let saved = try revocationCustomer ?? customer ?? FeedbackThreadConversationCredentials.load(account: account)
+        customer = saved
+        let request = saved == nil ? nil : try makeRequest(path: "/session", method: "DELETE", data: Data("{}".utf8))
+        revocationCustomer = saved
+        customer = nil
+        try FeedbackThreadConversationCredentials.remove(account: account)
+        if let request {
+            struct Result: Decodable { let ok: Bool }
+            do { let _: Result = try await decode(request, allowSessionChange: true) }
+            catch FeedbackThreadError.server(statusCode: 401, message: _) { /* Already revoked. */ }
+        }
+        revocationCustomer = nil
     }
+
     public func refresh() async throws {
         let currentGeneration = generation
         refreshRequest += 1; let requestNumber = refreshRequest
@@ -152,6 +170,7 @@ public final class FeedbackThreadConversations: ObservableObject {
     }
     /// Forward notification taps here; false means the host should handle it.
     @discardableResult public func handleNotification(_ userInfo: [AnyHashable: Any]) -> Bool {
+        guard !closed else { return false }
         guard let payload = userInfo["feedbackThread"] as? [AnyHashable: Any], let route = FeedbackThreadConversationRoute(notification: payload) else { return false }
         if route.audience == .public && settingsLoaded && !publicCommentsEnabled { return true }
         presentedConversation = route
@@ -168,7 +187,7 @@ public final class FeedbackThreadConversations: ObservableObject {
         while liveRunning {
             do { try await Task.sleep(nanoseconds: 100_000_000) } catch { return }
         }
-        guard !Task.isCancelled else { return }
+        guard !Task.isCancelled, !closed else { return }
         liveRunning = true
         defer { liveRunning = false; isConnected = false; socket?.cancel(with: .goingAway, reason: nil); socket = nil }
         var delay: UInt64 = 1
@@ -224,8 +243,12 @@ public final class FeedbackThreadConversations: ObservableObject {
         if authenticated { request.setValue(customer?.token, forHTTPHeaderField: "X-FeedbackThread-Customer") }
         return request
     }
-    private func decode<T: Decodable>(_ request: URLRequest) async throws -> T {
+    private func decode<T: Decodable>(_ request: URLRequest, allowSessionChange: Bool = false) async throws -> T {
+        let startedGeneration = generation
         let (data, response) = try await transport.data(for: request)
+        if !allowSessionChange {
+            guard !closed, generation == startedGeneration else { throw CancellationError() }
+        }
         guard let response = response as? HTTPURLResponse else { throw FeedbackThreadError.invalidResponse }
         guard (200..<300).contains(response.statusCode) else {
             let message = (try? JSONDecoder().decode(ErrorBody.self, from: data))?.error.message ?? "Could not load the conversation."

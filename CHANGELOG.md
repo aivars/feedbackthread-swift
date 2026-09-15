@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.5.1 — 2026-09-15
+
+- Permanently close a conversation manager on logout, discard stale private responses, and retain an issued credential until revocation succeeds.
+- Keep durable sends successful when the follow-up inbox refresh fails.
+
 ## 0.5.0 — 2026-09-11
 
 - Add customer conversations: secure guest credentials, private
