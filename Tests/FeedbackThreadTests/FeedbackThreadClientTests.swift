@@ -664,6 +664,38 @@ struct FeedbackThreadClientTests {
         #expect(!chat.handleNotification(["unrelated": "notification"]))
     }
 
+    @MainActor
+    @Test("Logout revokes the guest and permanently closes that conversation object")
+    func conversationLogout() async throws {
+        let identity = FeedbackThreadCustomerSession(customerId: "customer", externalUserId: "ft-guest:customer", token: "test-customer-credential")
+        let recorder = RequestRecorder { request in
+            #expect(request.httpMethod == "DELETE")
+            #expect(request.value(forHTTPHeaderField: "X-FeedbackThread-Customer") == identity.token)
+            return try response(statusCode: 200, json: ["ok": true])
+        }
+        let configuration = try FeedbackThreadConfiguration(baseURL: URL(string: "https://example.com")!, projectKey: "project-key", customerSession: identity)
+        let chat = FeedbackThreadConversations(configuration: configuration, accountScope: UUID().uuidString, session: recorder.session)
+        try await chat.logout()
+        do { _ = try await chat.prepare(); Issue.record("A logged-out object created a new guest") }
+        catch is CancellationError { }
+        #expect(chat.inbox.isEmpty && chat.unreadCount == 0)
+        #expect(!chat.handleNotification(["feedbackThread": ["feedbackId": "FDBK-1", "audience": "private"]]))
+    }
+
+    @MainActor
+    @Test("A durable send stays successful when the follow-up refresh fails")
+    func conversationSendRefreshFailure() async throws {
+        let identity = FeedbackThreadCustomerSession(customerId: "customer", externalUserId: "ft-guest:customer", token: "test-customer-credential")
+        let recorder = RequestRecorder { request in
+            if request.httpMethod == "POST" { return try response(statusCode: 201, json: ["id": "message-id"]) }
+            return try response(statusCode: 503, json: ["error": ["message": "Temporarily unavailable"]])
+        }
+        let configuration = try FeedbackThreadConfiguration(baseURL: URL(string: "https://example.com")!, projectKey: "project-key", customerSession: identity)
+        let chat = FeedbackThreadConversations(configuration: configuration, session: recorder.session)
+        try await chat.send("A reply", feedbackId: "FDBK-1", audience: .private, clientId: "stable-client-id")
+        #expect(chat.errorMessage != nil)
+    }
+
     @Test("Submits through the live staging service when configured")
     func liveSubmission() async throws {
         let environment = ProcessInfo.processInfo.environment

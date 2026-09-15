@@ -253,3 +253,10 @@ Historical feedback without secure conversation identity remains readable but
 has no private reply link. The SDK does not silently claim it. New conversation
 UI copy is English pending localization QA. A message marked **Posted** is saved;
 **Read** requires the other participant's read cursor, not a push response.
+
+### Unreleased conversation fixes
+
+A logged-out `FeedbackThreadConversations` object now stays closed. Retain it to
+retry a failed remote revocation, then replace it for the next account. Late
+private responses are discarded. A successfully posted message also remains a
+successful send if refreshing the inbox subsequently fails.
