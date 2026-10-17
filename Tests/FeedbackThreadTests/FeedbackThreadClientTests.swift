@@ -696,6 +696,28 @@ struct FeedbackThreadClientTests {
         #expect(chat.errorMessage != nil)
     }
 
+    @MainActor
+    @Test("A conversation error keeps the server's message and falls back to the SDK's own copy")
+    func conversationErrorMessages() async throws {
+        let identity = FeedbackThreadCustomerSession(customerId: "customer", externalUserId: "ft-guest:customer", token: "test-customer-credential")
+        let recorder = RequestRecorder { request in
+            if request.url?.path.hasSuffix("/FDBK-1/private") == true {
+                return try response(statusCode: 503, json: ["error": ["message": "Temporarily unavailable"]])
+            }
+            return try response(statusCode: 500, json: [:])
+        }
+        let configuration = try FeedbackThreadConfiguration(baseURL: URL(string: "https://example.com")!, projectKey: "project-key", customerSession: identity)
+        let chat = FeedbackThreadConversations(configuration: configuration, session: recorder.session)
+
+        await #expect(throws: FeedbackThreadError.server(statusCode: 503, message: "Temporarily unavailable")) {
+            _ = try await chat.history(feedbackId: "FDBK-1", audience: .private)
+        }
+        // No readable body: the SDK writes the message itself, from its own catalog.
+        await #expect(throws: FeedbackThreadError.server(statusCode: 500, message: String(localized: "Could not load the conversation.", bundle: .feedbackThread))) {
+            _ = try await chat.history(feedbackId: "FDBK-2", audience: .private)
+        }
+    }
+
     @Test("Submits through the live staging service when configured")
     func liveSubmission() async throws {
         let environment = ProcessInfo.processInfo.environment

@@ -1,5 +1,22 @@
 # Changelog
 
+## Unreleased
+
+The conversation screens are localized, and ship in English and Italian.
+
+- Every user-facing and VoiceOver string of the 0.5.0 conversation UI now lives
+  in the SDK's String Catalog (32 new keys, 82 in all): the conversation view,
+  the Messages list, the new-reply banner and the sheet it opens, the board's
+  Messages and Comments links, and My Requests' partial-load notice. Their
+  literals used to resolve against the host app's bundle, so no SDK translation
+  could reach them; they now resolve against the SDK's own bundle, like the
+  board's.
+- "Message removed" and the "Could not load the conversation." fallback, which
+  were plain `String`s shown verbatim, are catalog entries too. An error message
+  the API supplies is still passed through as received.
+- The unread-count VoiceOver label gained a proper plural.
+- **No API change.**
+
 ## 0.5.1 — 2026-09-15
 
 - Permanently close a conversation manager on logout, discard stale private responses, and retain an issued credential until revocation succeeds.

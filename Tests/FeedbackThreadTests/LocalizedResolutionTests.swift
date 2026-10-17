@@ -196,6 +196,25 @@ struct LocalizedResolutionTests {
         #expect(CompiledCatalog.plural("%lld votes", count: votes, in: language) == expected)
     }
 
+    @Test(
+        "Picks the right plural for a conversation's unread count",
+        arguments: [
+            ("it", 1, "1 messaggio non letto"),
+            ("it", 3, "3 messaggi non letti"),
+            ("en", 1, "1 unread message"),
+            ("en", 3, "3 unread messages"),
+        ]
+    )
+    func unreadMessagesPlural(language: String, unread: Int, expected: String) throws {
+        #expect(CompiledCatalog.plural("%lld unread messages", count: unread, in: language) == expected)
+    }
+
+    @Test("Resolves the Messages button's unread label in Italian")
+    func messagesButtonInItalian() throws {
+        #expect(CompiledCatalog.plural("Messages (%lld)", count: 4, in: "it") == "Messaggi (4)")
+        #expect(CompiledCatalog.plural("Messages (%lld)", count: 4, in: "en") == "Messages (4)")
+    }
+
     // MARK: - Errors
 
     @Test("Resolves the two end-user error messages in Italian")
@@ -207,6 +226,10 @@ struct LocalizedResolutionTests {
         #expect(
             CompiledCatalog.plural("FeedbackThread returned HTTP %lld.", count: 503, in: "it")
                 == "FeedbackThread ha restituito il codice HTTP 503."
+        )
+        #expect(
+            try Self.resolve("Could not load the conversation.", in: "it")
+                == "Impossibile caricare la conversazione."
         )
     }
 
@@ -233,6 +256,33 @@ struct LocalizedResolutionTests {
         ]
     )
     func viewCopyInItalian(key: String, italian: String) throws {
+        #expect(try Self.resolve(key, in: "it") == italian)
+    }
+
+    @Test(
+        "Resolves the conversation views' copy in Italian",
+        arguments: [
+            ("Messages", "Messaggi"),
+            ("Conversation", "Conversazione"),
+            ("Comments", "Commenti"),
+            ("Private conversation", "Conversazione privata"),
+            ("Only you and the developer can read this conversation.", "Solo tu e lo sviluppatore potete leggere questa conversazione."),
+            ("Reply to the developer…", "Rispondi allo sviluppatore…"),
+            ("Send reply", "Invia risposta"),
+            ("Load earlier messages", "Carica i messaggi precedenti"),
+            ("Notify me", "Avvisami"),
+            ("Mute notifications", "Disattiva le notifiche"),
+            ("Developer", "Sviluppatore"),
+            ("You", "Tu"),
+            ("Read", "Letto"),
+            ("Posted", "Inviato"),
+            ("Message removed", "Messaggio rimosso"),
+            ("Remove message", "Rimuovi messaggio"),
+            ("New reply about your feedback", "Nuova risposta al tuo feedback"),
+            ("Dismiss", "Chiudi"),
+        ]
+    )
+    func conversationCopyInItalian(key: String, italian: String) throws {
         #expect(try Self.resolve(key, in: "it") == italian)
     }
 }

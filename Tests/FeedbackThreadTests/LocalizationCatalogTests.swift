@@ -160,17 +160,20 @@ struct LocalizationCatalogTests {
         }
     }
 
-    @Test("Gives the votes accessibility value a plural variation in every language")
-    func votesUsesPlurals() throws {
-        let entry = try #require(Self.catalog.strings["%lld votes"])
+    @Test(
+        "Gives every counted accessibility label a plural variation in every language",
+        arguments: ["%lld votes", "%lld unread messages"]
+    )
+    func countsUsePlurals(key: String) throws {
+        let entry = try #require(Self.catalog.strings[key])
         let localizations = try #require(entry.localizations)
         for language in Self.catalogLanguages {
             let plural = try #require(
                 localizations[language]?.variations?.plural,
-                "\"%lld votes\" has no plural variation in \(language)"
+                "\"\(key)\" has no plural variation in \(language)"
             )
-            #expect(plural["one"] != nil, "\"%lld votes\" is missing the 'one' category in \(language)")
-            #expect(plural["other"] != nil, "\"%lld votes\" is missing the 'other' category in \(language)")
+            #expect(plural["one"] != nil, "\"\(key)\" is missing the 'one' category in \(language)")
+            #expect(plural["other"] != nil, "\"\(key)\" is missing the 'other' category in \(language)")
         }
     }
 

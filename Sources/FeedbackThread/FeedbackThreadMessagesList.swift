@@ -11,16 +11,16 @@ public struct FeedbackThreadMessagesList: View {
                     FeedbackThreadConversationView(conversations: conversations, feedbackId: thread.feedbackId, audience: thread.audience)
                 } label: {
                     VStack(alignment: .leading, spacing: 5) {
-                        HStack { Text(thread.title).font(.headline); Spacer(); if thread.unreadCount > 0 { Text("\(thread.unreadCount)").font(.caption.bold()).foregroundStyle(Color.accentColor).accessibilityLabel("\(thread.unreadCount) unread messages") } }
-                        Text(thread.audience == .private ? "Private conversation" : "Public comments").font(.caption).foregroundStyle(.secondary)
+                        HStack { Text(thread.title).font(.headline); Spacer(); if thread.unreadCount > 0 { Text(verbatim: "\(thread.unreadCount)").font(.caption.bold()).foregroundStyle(Color.accentColor).accessibilityLabel(Text("\(thread.unreadCount) unread messages", bundle: .module)) } }
+                        Text(thread.audience == .private ? "Private conversation" : "Public comments", bundle: .module).font(.caption).foregroundStyle(.secondary)
                         Text(thread.preview).lineLimit(2)
                     }
                 }
             }
-            if conversations.inbox.isEmpty { Text("Replies to your feedback will appear here.").foregroundStyle(.secondary) }
+            if conversations.inbox.isEmpty { Text("Replies to your feedback will appear here.", bundle: .module).foregroundStyle(.secondary) }
             if let error = conversations.errorMessage { Text(error).foregroundStyle(.red) }
         }
-        .navigationTitle("Messages")
+        .navigationTitle(Text("Messages", bundle: .module))
         .task { try? await conversations.refresh() }
         .refreshable { try? await conversations.refresh() }
     }
@@ -44,16 +44,16 @@ private struct FeedbackThreadConversationHost: ViewModifier {
                 if let banner = conversations.banner, conversations.activeConversation?.id != banner.id {
                     HStack {
                         Button { conversations.presentedConversation = .init(feedbackId: banner.feedbackId, audience: banner.audience); conversations.dismissBanner() } label: {
-                            Label("New reply about your feedback", systemImage: "bubble.left.and.bubble.right").frame(maxWidth: .infinity, alignment: .leading)
+                            Label { Text("New reply about your feedback", bundle: .module) } icon: { Image(systemName: "bubble.left.and.bubble.right") }.frame(maxWidth: .infinity, alignment: .leading)
                         }
-                        Button { conversations.dismissBanner() } label: { Label("Dismiss", systemImage: "xmark") }.labelStyle(.iconOnly).frame(minWidth: 44, minHeight: 44)
+                        Button { conversations.dismissBanner() } label: { Label { Text("Dismiss", bundle: .module) } icon: { Image(systemName: "xmark") } }.labelStyle(.iconOnly).frame(minWidth: 44, minHeight: 44)
                     }.padding().background(.regularMaterial, in: RoundedRectangle(cornerRadius: 14)).padding()
                 }
             }
             .sheet(item: $conversations.presentedConversation) { route in
                 NavigationStack {
                     FeedbackThreadConversationView(conversations: conversations, feedbackId: route.feedbackId, audience: route.audience)
-                        .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Done") { conversations.presentedConversation = nil } } }
+                        .toolbar { ToolbarItem(placement: .cancellationAction) { Button { conversations.presentedConversation = nil } label: { Text("Done", bundle: .module) } } }
                 }
             }
     }

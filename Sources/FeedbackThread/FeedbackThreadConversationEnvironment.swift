@@ -16,8 +16,10 @@ struct FeedbackThreadCommentsLink: View {
     let feedbackId: String
     var body: some View {
         if conversations.publicCommentsEnabled {
-            NavigationLink("Comments") {
+            NavigationLink {
                 FeedbackThreadConversationView(conversations: conversations, feedbackId: feedbackId, audience: .public)
+            } label: {
+                Text("Comments", bundle: .module)
             }
         }
     }
@@ -38,7 +40,7 @@ struct FeedbackThreadMessagesLink: View {
                             .offset(x: 9, y: -9)
                     }
                 }
-                .accessibilityLabel(conversations.unreadCount > 0 ? "Messages (\(conversations.unreadCount))" : "Messages")
+                .accessibilityLabel(conversations.unreadCount > 0 ? Text("Messages (\(conversations.unreadCount))", bundle: .module) : Text("Messages", bundle: .module))
         }
     }
 }
