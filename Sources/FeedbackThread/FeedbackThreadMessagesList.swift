@@ -39,7 +39,9 @@ private struct FeedbackThreadConversationHost: ViewModifier {
     func body(content: Content) -> some View {
         content
             .environment(\.feedbackThreadConversations, conversations)
-            .task(id: scenePhase) { if scenePhase == .active { await conversations.runLive() } }
+            // Keyed on the object too: a host that replaces it (after `logout()`) gets the new
+            // one's live loop now, not at the next foreground.
+            .task(id: "\(ObjectIdentifier(conversations))-\(scenePhase)") { if scenePhase == .active { await conversations.runLive() } }
             .overlay(alignment: .top) {
                 if let banner = conversations.banner, conversations.activeConversation?.id != banner.id {
                     HStack {
