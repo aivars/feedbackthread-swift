@@ -251,7 +251,7 @@ public final class FeedbackThreadConversations: ObservableObject {
         }
         guard let response = response as? HTTPURLResponse else { throw FeedbackThreadError.invalidResponse }
         guard (200..<300).contains(response.statusCode) else {
-            let message = (try? JSONDecoder().decode(ErrorBody.self, from: data))?.error.message ?? "Could not load the conversation."
+            let message = (try? JSONDecoder().decode(ErrorBody.self, from: data))?.error.message ?? String(localized: "Could not load the conversation.", bundle: .module)
             throw FeedbackThreadError.server(statusCode: response.statusCode, message: message)
         }
         return try JSONDecoder().decode(T.self, from: data)

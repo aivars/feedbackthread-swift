@@ -25,13 +25,13 @@ public struct FeedbackThreadConversationView: View {
     public var body: some View {
         Group {
             if route.audience == .public && !conversations.publicCommentsEnabled {
-                Text("Public comments are not available for this app. You can still suggest features and vote.").padding()
+                Text("Public comments are not available for this app. You can still suggest features and vote.", bundle: .module).padding()
             } else { conversationContent }
         }
     }
     private var conversationContent: some View {
         VStack(spacing: 0) {
-            Text(route.audience == .private ? "Only you and the developer can read this conversation." : "These comments are visible to everyone who can access this request.")
+            Text(route.audience == .private ? "Only you and the developer can read this conversation." : "These comments are visible to everyone who can access this request.", bundle: .module)
                 .font(.footnote).foregroundStyle(.secondary).padding()
             if let error { Text(error).font(.footnote).foregroundStyle(.red).padding(.horizontal).accessibilityAddTraits(.updatesFrequently) }
             GeometryReader { bounds in
@@ -39,12 +39,12 @@ public struct FeedbackThreadConversationView: View {
                     ScrollView {
                         LazyVStack(alignment: .leading, spacing: 12) {
                             if let nextBefore {
-                                Button("Load earlier messages") { Task { await loadEarlier(before: nextBefore) } }
+                                Button { Task { await loadEarlier(before: nextBefore) } } label: { Text("Load earlier messages", bundle: .module) }
                             }
                             ForEach(displayMessages) { message in
                                 messageRow(message).id(message.id)
                             }
-                            if history?.messages.isEmpty == true { Text("No messages yet. Start the conversation below.").foregroundStyle(.secondary) }
+                            if history?.messages.isEmpty == true { Text("No messages yet. Start the conversation below.", bundle: .module).foregroundStyle(.secondary) }
                             Color.clear.frame(height: 1).id("latest")
                                 .background(GeometryReader { marker in
                                     Color.clear.preference(key: ConversationEndPosition.self, value: marker.frame(in: .named("conversation")).maxY)
@@ -57,26 +57,29 @@ public struct FeedbackThreadConversationView: View {
                         if firstLoad || bottomVisible { proxy.scrollTo("latest", anchor: .bottom); firstLoad = false }
                     }
                     .safeAreaInset(edge: .bottom) {
-                        if !bottomVisible && history != nil { Button("Jump to latest message") { proxy.scrollTo("latest", anchor: .bottom) }.padding(8).background(.regularMaterial) }
+                        if !bottomVisible && history != nil { Button { proxy.scrollTo("latest", anchor: .bottom) } label: { Text("Jump to latest message", bundle: .module) }.padding(8).background(.regularMaterial) }
                     }
                 }
             }
             HStack(alignment: .bottom) {
-                TextField(route.audience == .private ? "Reply to the developer…" : "Write a public comment…", text: $draft, axis: .vertical)
+                // `TextField(_:text:)` takes a `LocalizedStringKey` that would
+                // resolve against the host app's bundle, so the placeholder is
+                // resolved here and handed over as a plain String.
+                TextField(String(localized: route.audience == .private ? "Reply to the developer…" : "Write a public comment…", bundle: .module), text: $draft, axis: .vertical)
                     .lineLimit(1...6).textFieldStyle(.roundedBorder).disabled(sending)
                     .onChange(of: draft) { value in if value.count > 4000 { draft = String(value.prefix(4000)) } }
-                Button(route.audience == .private ? "Send reply" : "Post comment") { Task { await send() } }
+                Button { Task { await send() } } label: { Text(route.audience == .private ? "Send reply" : "Post comment", bundle: .module) }
                     .buttonStyle(.borderedProminent).frame(minHeight: 44).disabled(sending || history == nil || draft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
             }.padding()
         }
-        .navigationTitle(route.audience == .private ? "Conversation" : "Comments")
+        .navigationTitle(Text(route.audience == .private ? "Conversation" : "Comments", bundle: .module))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             if let history {
                 Button {
                     Task { do { try await conversations.follow(!history.following, feedbackId: route.feedbackId, audience: route.audience); await load() } catch { self.error = error.localizedDescription } }
                 } label: {
-                    Label(history.following ? "Mute notifications" : "Notify me", systemImage: history.following ? "bell.slash" : "bell")
+                    Label { Text(history.following ? "Mute notifications" : "Notify me", bundle: .module) } icon: { Image(systemName: history.following ? "bell.slash" : "bell") }
                 }
                 .labelStyle(.iconOnly)
             }
@@ -93,24 +96,25 @@ public struct FeedbackThreadConversationView: View {
         }
         .onAppear { conversations.activeConversation = route; conversations.dismissBanner() }
         .onDisappear { if conversations.activeConversation == route { conversations.activeConversation = nil } }
-        .confirmationDialog("Remove this message?", isPresented: Binding(get: { removeTarget != nil }, set: { if !$0 { removeTarget = nil } }), titleVisibility: .visible) {
-            Button("Remove message", role: .destructive) {
+        .confirmationDialog(Text("Remove this message?", bundle: .module), isPresented: Binding(get: { removeTarget != nil }, set: { if !$0 { removeTarget = nil } }), titleVisibility: .visible) {
+            Button(role: .destructive) {
                 guard let message = removeTarget else { return }
                 Task { do { try await conversations.remove(messageId: message.id, feedbackId: route.feedbackId, audience: route.audience); await load() } catch { self.error = error.localizedDescription }; removeTarget = nil }
-            }
+            } label: { Text("Remove message", bundle: .module) }
         }
     }
     private func messageRow(_ message: FeedbackThreadConversationMessage) -> some View {
         VStack(alignment: .leading, spacing: 6) {
-            HStack { Text(message.authorRole == "developer" ? "Developer" : message.mine ? "You" : "App user").font(.caption.bold()); Spacer() }
-            Text(message.deletedAt == nil ? message.body : "Message removed").textSelection(.enabled)
+            HStack { Text(message.authorRole == "developer" ? "Developer" : message.mine ? "You" : "App user", bundle: .module).font(.caption.bold()); Spacer() }
+            // The body is user text and stays verbatim; only the placeholder is SDK copy.
+            Group { if message.deletedAt == nil { Text(message.body) } else { Text("Message removed", bundle: .module) } }.textSelection(.enabled)
             if message.mine {
-                Text((history?.otherReadSeq ?? 0) >= message.seq ? "Read" : "Posted").font(.caption).foregroundStyle(.secondary)
+                Text((history?.otherReadSeq ?? 0) >= message.seq ? "Read" : "Posted", bundle: .module).font(.caption).foregroundStyle(.secondary)
             }
         }
         .padding(12).frame(maxWidth: .infinity, alignment: .leading)
         .background(message.mine ? Color.accentColor.opacity(0.1) : Color.secondary.opacity(0.08), in: RoundedRectangle(cornerRadius: 12))
-        .contextMenu { if message.mine && message.deletedAt == nil { Button("Remove message", role: .destructive) { removeTarget = message } } }
+        .contextMenu { if message.mine && message.deletedAt == nil { Button(role: .destructive) { removeTarget = message } label: { Text("Remove message", bundle: .module) } } }
     }
     private var displayMessages: [FeedbackThreadConversationMessage] {
         var items: [String: FeedbackThreadConversationMessage] = [:]

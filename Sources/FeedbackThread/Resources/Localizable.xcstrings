@@ -1,6 +1,48 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "%lld unread messages" : {
+      "comment" : "Accessibility label of a conversation's unread count in the Messages list; %lld is how many messages are unread.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld unread message"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld unread messages"
+                }
+              }
+            }
+          }
+        },
+        "it" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld messaggio non letto"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld messaggi non letti"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "%lld votes" : {
       "comment" : "Accessibility value of the vote button: how many votes the request has.",
       "extractionState" : "manual",
@@ -75,6 +117,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tutto ciò che invii compare qui, anche mentre è in attesa di revisione."
+          }
+        }
+      }
+    },
+    "App user" : {
+      "comment" : "Author name above another app user's public comment in a conversation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App user"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Utente dell’app"
           }
         }
       }
@@ -187,6 +247,24 @@
         }
       }
     },
+    "Comments" : {
+      "comment" : "Link on a request's detail view that opens its public comments, and the title of that conversation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comments"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Commenti"
+          }
+        }
+      }
+    },
     "Completed" : {
       "comment" : "Request status, and the matching filter chip.",
       "extractionState" : "manual",
@@ -201,6 +279,42 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Completata"
+          }
+        }
+      }
+    },
+    "Conversation" : {
+      "comment" : "Title of a private conversation between the user and the app developer about one of their requests.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conversation"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conversazione"
+          }
+        }
+      }
+    },
+    "Could not load the conversation." : {
+      "comment" : "Error shown to the end user when the conversation API fails without a readable message.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Could not load the conversation."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossibile caricare la conversazione."
           }
         }
       }
@@ -237,6 +351,42 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Impossibile caricare le tue richieste"
+          }
+        }
+      }
+    },
+    "Developer" : {
+      "comment" : "Author name above the app developer's messages in a conversation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Developer"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sviluppatore"
+          }
+        }
+      }
+    },
+    "Dismiss" : {
+      "comment" : "Accessibility label of the icon button that hides the new-reply banner.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dismiss"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chiudi"
           }
         }
       }
@@ -421,6 +571,42 @@
         }
       }
     },
+    "Jump to latest message" : {
+      "comment" : "Button shown while a conversation is scrolled away from the bottom; scrolls to the newest message.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jump to latest message"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vai all’ultimo messaggio"
+          }
+        }
+      }
+    },
+    "Load earlier messages" : {
+      "comment" : "Button at the top of a conversation that loads older messages.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Load earlier messages"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Carica i messaggi precedenti"
+          }
+        }
+      }
+    },
     "Loading requests…" : {
       "comment" : "Progress indicator while the public board loads.",
       "extractionState" : "manual",
@@ -457,6 +643,78 @@
         }
       }
     },
+    "Message removed" : {
+      "comment" : "Shown in a conversation in place of a message its author removed.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Message removed"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Messaggio rimosso"
+          }
+        }
+      }
+    },
+    "Messages" : {
+      "comment" : "Title of the list of the user's conversations, and the accessibility label of the board's button that opens it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Messages"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Messaggi"
+          }
+        }
+      }
+    },
+    "Messages (%lld)" : {
+      "comment" : "Accessibility label of the board's Messages button when there are unread messages; %lld is how many.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Messages (%lld)"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Messaggi (%lld)"
+          }
+        }
+      }
+    },
+    "Mute notifications" : {
+      "comment" : "Accessibility label of the bell button in a conversation the user follows: stop notifying them of new messages.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mute notifications"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Disattiva le notifiche"
+          }
+        }
+      }
+    },
     "My requests" : {
       "comment" : "Navigation title of the My Requests list, and the accessibility label of the toolbar button that opens it.",
       "extractionState" : "manual",
@@ -471,6 +729,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Le mie richieste"
+          }
+        }
+      }
+    },
+    "New reply about your feedback" : {
+      "comment" : "Banner shown anywhere in the app when the developer replies; tapping it opens the conversation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New reply about your feedback"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nuova risposta al tuo feedback"
           }
         }
       }
@@ -507,6 +783,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ancora nessuna richiesta"
+          }
+        }
+      }
+    },
+    "No messages yet. Start the conversation below." : {
+      "comment" : "Shown in a conversation that has no messages yet; the message field is below it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No messages yet. Start the conversation below."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ancora nessun messaggio. Inizia la conversazione qui sotto."
           }
         }
       }
@@ -601,6 +895,42 @@
         }
       }
     },
+    "Notify me" : {
+      "comment" : "Accessibility label of the bell button in a conversation the user does not follow: notify them of new messages.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notify me"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avvisami"
+          }
+        }
+      }
+    },
+    "Only you and the developer can read this conversation." : {
+      "comment" : "Notice at the top of a private conversation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Only you and the developer can read this conversation."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solo tu e lo sviluppatore potete leggere questa conversazione."
+          }
+        }
+      }
+    },
     "Planned" : {
       "comment" : "Request status, and the matching filter chip.",
       "extractionState" : "manual",
@@ -615,6 +945,114 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pianificata"
+          }
+        }
+      }
+    },
+    "Post comment" : {
+      "comment" : "Send button in a request's public comments.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Post comment"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pubblica commento"
+          }
+        }
+      }
+    },
+    "Posted" : {
+      "comment" : "Under the user's own message: sent, not read by the other side yet. Agrees with 'message' (Italian: messaggio, masculine).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Posted"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inviato"
+          }
+        }
+      }
+    },
+    "Private conversation" : {
+      "comment" : "Kind of a conversation in the Messages list: private, between the user and the app developer.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Private conversation"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conversazione privata"
+          }
+        }
+      }
+    },
+    "Public comments" : {
+      "comment" : "Kind of a conversation in the Messages list: a request's public comments.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Public comments"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Commenti pubblici"
+          }
+        }
+      }
+    },
+    "Public comments are not available for this app. You can still suggest features and vote." : {
+      "comment" : "Shown instead of a request's public comments when the app has turned them off.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Public comments are not available for this app. You can still suggest features and vote."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I commenti pubblici non sono disponibili per questa app. Puoi comunque suggerire funzionalità e votare."
+          }
+        }
+      }
+    },
+    "Read" : {
+      "comment" : "Under the user's own message: the other side has read it (past participle). Agrees with 'message' (Italian: messaggio, masculine).",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Read"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Letto"
           }
         }
       }
@@ -637,6 +1075,42 @@
         }
       }
     },
+    "Remove message" : {
+      "comment" : "Context-menu action on the user's own message, and the destructive button that confirms removing it.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove message"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rimuovi messaggio"
+          }
+        }
+      }
+    },
+    "Remove this message?" : {
+      "comment" : "Title of the dialog that confirms removing one of the user's own messages.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove this message?"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rimuovere questo messaggio?"
+          }
+        }
+      }
+    },
     "Remove vote" : {
       "comment" : "Accessibility label of the vote button when the user has already voted.",
       "extractionState" : "manual",
@@ -651,6 +1125,42 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Rimuovi il voto"
+          }
+        }
+      }
+    },
+    "Replies to your feedback will appear here." : {
+      "comment" : "Shown in the Messages list when the user has no conversations yet.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Replies to your feedback will appear here."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le risposte al tuo feedback compariranno qui."
+          }
+        }
+      }
+    },
+    "Reply to the developer…" : {
+      "comment" : "Placeholder of the message field in a private conversation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reply to the developer…"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rispondi allo sviluppatore…"
           }
         }
       }
@@ -745,6 +1255,24 @@
         }
       }
     },
+    "Send reply" : {
+      "comment" : "Send button in a private conversation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Send reply"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Invia risposta"
+          }
+        }
+      }
+    },
     "Shipped" : {
       "comment" : "My Requests section header, above the caller's released requests.",
       "extractionState" : "manual",
@@ -813,6 +1341,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Suggerisci una funzionalità"
+          }
+        }
+      }
+    },
+    "These comments are visible to everyone who can access this request." : {
+      "comment" : "Notice at the top of a request's public comments.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "These comments are visible to everyone who can access this request."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Questi commenti sono visibili a chiunque possa accedere a questa richiesta."
           }
         }
       }
@@ -903,6 +1449,60 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cosa vuoi condividere?"
+          }
+        }
+      }
+    },
+    "Write a public comment…" : {
+      "comment" : "Placeholder of the message field in a request's public comments.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Write a public comment…"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scrivi un commento pubblico…"
+          }
+        }
+      }
+    },
+    "You" : {
+      "comment" : "Author name above the user's own messages in a conversation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu"
+          }
+        }
+      }
+    },
+    "Your earlier requests are shown. Couldn’t load newer requests; pull to refresh." : {
+      "comment" : "Footnote at the top of My Requests when only the requests sent before conversations were set up could load; the list supports pull to refresh.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your earlier requests are shown. Couldn’t load newer requests; pull to refresh."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vedi le tue richieste precedenti, ma non è stato possibile caricare quelle più recenti: trascina verso il basso per aggiornare."
           }
         }
       }

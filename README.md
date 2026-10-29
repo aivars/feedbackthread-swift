@@ -139,9 +139,9 @@ if a translation's format specifiers don't match the English ones.
 
 Two things stay untranslated on purpose:
 
-- **Server-supplied text** — request titles and descriptions, error messages
-  from the API, and any request status the SDK doesn't recognize are passed
-  through exactly as received.
+- **Server-supplied text** — request titles and descriptions, conversation
+  messages, error messages from the API, and any request status the SDK doesn't
+  recognize are passed through exactly as received.
 - **Configuration errors** — `FeedbackThreadError.invalidConfiguration` messages
   are addressed to you while you wire the SDK up, not to your users.
 
@@ -250,8 +250,9 @@ it on logout with `logout()`; handle errors and stop using the old authenticated
 client. Legacy history remains governed by the original client/external user ID.
 
 Historical feedback without secure conversation identity remains readable but
-has no private reply link. The SDK does not silently claim it. New conversation
-UI copy is English pending localization QA. A message marked **Posted** is saved;
+has no private reply link. The SDK does not silently claim it. The conversation
+screens are localized like the rest of the SDK (see [Localization](#localization)).
+A message marked **Posted** is saved;
 **Read** requires the other participant's read cursor, not a push response.
 
 ### Conversation fixes in 0.5.1

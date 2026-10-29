@@ -24,7 +24,7 @@ public struct FeedbackThreadMyRequestsList: View {
     private let onUnreadCountChange: ((Int) -> Void)?
 
     @AppStorage("com.feedbackthread.sdk.voter-id") private var storedVoterID = ""
-    @State private var conversationLoadError: String?
+    @State private var conversationLoadError: LocalizedStringResource?
     @State private var myRequests: [FeedbackThreadMyRequest] = []
     @State private var loadState: LoadState = .loading
 
@@ -176,7 +176,7 @@ public struct FeedbackThreadMyRequestsList: View {
                     updates = try await conversations.myUpdates(including: client, externalUserID: voterID)
                 }
                 catch is CancellationError { return }
-                catch { conversationLoadError = "Your earlier requests are shown. Couldn’t load newer requests; pull to refresh." }
+                catch { conversationLoadError = .feedbackThread("Your earlier requests are shown. Couldn’t load newer requests; pull to refresh.") }
             }
             loadState = .loaded
             onUnreadCountChange?(updates.unreadCount)
