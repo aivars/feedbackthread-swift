@@ -33,7 +33,7 @@ In Xcode: **File → Add Package Dependencies…** and enter
 https://github.com/aivars/feedbackthread-swift.git
 ```
 
-Choose **Up to Next Major Version** from `0.5.1` and add the `FeedbackThread` product.
+Choose **Up to Next Major Version** from `0.5.2` and add the `FeedbackThread` product.
 
 ## Quick start
 
@@ -254,6 +254,12 @@ has no private reply link. The SDK does not silently claim it. The conversation
 screens are localized like the rest of the SDK (see [Localization](#localization)).
 A message marked **Posted** is saved;
 **Read** requires the other participant's read cursor, not a push response.
+
+### Conversation fixes in 0.5.2
+
+Conversation screens now ship in English and Italian. Replacing the conversation
+manager after logout immediately starts the new account's live updates, including
+unread badges and reply banners, without waiting for the next foreground transition.
 
 ### Conversation fixes in 0.5.1
 

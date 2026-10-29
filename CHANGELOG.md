@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.5.2 — 2026-10-29
 
 The conversation screens are localized, and ship in English and Italian.
 
@@ -15,6 +15,9 @@ The conversation screens are localized, and ship in English and Italian.
   were plain `String`s shown verbatim, are catalog entries too. An error message
   the API supplies is still passed through as received.
 - The unread-count VoiceOver label gained a proper plural.
+- Replacing the conversation manager after logout now starts the new account's
+  live updates immediately, without waiting for a foreground transition. The
+  root modifier tracks both manager identity and scene phase.
 - **No API change.**
 
 ## 0.5.1 — 2026-09-15
